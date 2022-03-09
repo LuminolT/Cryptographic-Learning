@@ -27,6 +27,7 @@ def dec(s, A, b, n):
         l.append(ord(i) - ord('a'))
     M = np.array(l)
     C = np.linalg.inv(A) * (M - b) 
+    ## Get the invert in mod
     res = ''
     for idx in range(np.shape(A)[0]):
         C[0][idx] = C[0][idx] % n
