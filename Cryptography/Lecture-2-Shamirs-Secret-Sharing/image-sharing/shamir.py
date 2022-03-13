@@ -42,16 +42,18 @@ def _div_gf2(a, b):
 
 
 class _Element(object):
-    """Element of GF(2^128) field"""
+    """Element of GF(2^8) field"""
 
-    # The irreducible polynomial defining this field is 1+x+x^2+x^7+x^128
-    irr_poly = 1 + 2 + 4 + 128 + 2 ** 128
+    # The irreducible polynomial defining this field is 1+x+x^2+x^7+x^8
+    irr_poly = 1 + 2 + 8 + 16 + 2 ** 8
+    ## 有限域GF(28)上一个8次不可约多项式的模加、点乘（为方便代码实现，推出了X乘的概念），其中，这个不可约多项式为：m(x)= x8+x4+x3+x+1
+    ## https://cxybb.com/article/weixin_33860553/94179708
 
     def __init__(self, encoded_value):
         """Initialize the element to a certain value.
 
         The value passed as parameter is internally encoded as
-        a 128-bit integer, where each bit represents a polynomial
+        a 8-bit integer, where each bit represents a polynomial
         coefficient. The LSB is the constant coefficient.
         """
 
@@ -67,7 +69,7 @@ class _Element(object):
         return self._value == other._value
 
     def __int__(self):
-        """Return the field element, encoded as a 128-bit integer."""
+        """Return the field element, encoded as a 8-bit integer."""
         return self._value
 
     def encode(self):
@@ -86,15 +88,15 @@ class _Element(object):
         if self.irr_poly in (f1, f2):
             return _Element(0)
 
-        mask1 = 2 ** 128
+        mask1 = 2 ** 8
         v, z = f1, 0
         while f2:
             # if f2 ^ 1: z ^= v
-            mask2 = int(bin(f2 & 1)[2:] * 128, base=2)
+            mask2 = int(bin(f2 & 1)[2:] * 8, base=2)
             z = (mask2 & (z ^ v)) | ((mask1 - mask2 - 1) & z)
             v <<= 1
             # if v & mask1: v ^= self.irr_poly
-            mask3 = int(bin((v >> 128) & 1)[2:] * 128, base=2)
+            mask3 = int(bin((v >> 8) & 1)[2:] * 8, base=2)
             v = (mask3 & (v ^ self.irr_poly)) | ((mask1 - mask3 - 1) & v)
             f2 >>= 1
         return _Element(z)
@@ -103,7 +105,7 @@ class _Element(object):
         return _Element(self._value ^ term._value)
 
     def inverse(self):
-        """Return the inverse of this element in GF(2^128)."""
+        """Return the inverse of this element in GF(2^8)."""
 
         # We use the Extended GCD algorithm
         # http://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor
@@ -150,7 +152,7 @@ class Shamir(object):
           n (integer):
             The number of shares that this method will create.
           secret (byte string):
-            A byte string of 16 bytes (e.g. the AES 128 key).
+            A byte string of 16 bytes (e.g. the AES 8 key).
           ssss (bool):
             If ``True``, the shares can be used with the ``ssss`` utility.
             Default: ``False``.
@@ -163,7 +165,7 @@ class Shamir(object):
         """
 
         #
-        # We create a polynomial with random coefficients in GF(2^128):
+        # We create a polynomial with random coefficients in GF(2^8):
         #
         # p(x) = \sum_{i=0}^{k-1} c_i * x^i
         #
@@ -243,7 +245,7 @@ class Shamir(object):
                     numerator *= x_m
                     denominator *= x_j + x_m
             result += y_j * numerator * denominator.inverse()
-        return result.encode()
+        return result._value
 
 
 # from utils import *
