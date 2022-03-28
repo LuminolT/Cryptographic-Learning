@@ -7,5 +7,5 @@ for i in range(1, modulus):
     for j in range(1, modulus):
         order = j if tmp == 1 and j < order else order 
         print(f"{tmp}, ", end='')
-        tmp = tmp * i % modulus
+        tmp = tmp * i % modulus ## * i denotes the operation
     print(f' order = {order}')
