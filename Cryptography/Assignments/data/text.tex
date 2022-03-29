@@ -1,4 +1,7 @@
-\chapter{Week 2}
+\chapter{第一次作业}
+
+\newpage
+\chapter{第二次作业}
 
 \section{完美安全性}
 
@@ -37,3 +40,154 @@
 \end{equation}
 
 因此该加密方案不满足完美安全性，原命题不成立。
+
+\section{3级线性反馈移位寄存器}
+
+\textbf{题目}:已知流密码的密文串 1010110110 和对应的明文串
+0100010001，且知道密钥流是使用 3 级线性反馈移位寄存器产生的，试破译
+该密码系统。
+
+\textbf{解答}:由于密钥流是由3级LFSR产生，且明文串$msg=0100010001$，密文串$cipher=1010110110$
+因此密钥流（即为一段状态流）为：
+\begin{equation}
+    a = msg \oplus cipher = 1110100111
+\end{equation}
+
+则可根据状态流前$6$个bit建立如下方程：
+\begin{equation}
+    \left[
+        \begin{matrix}
+            a_4&a_5&a_6
+        \end{matrix}
+    \right]
+    =
+    \left[
+        \begin{matrix}
+            c_3&c_2&c_1
+        \end{matrix}
+    \right]
+    \left[
+        \begin{matrix}
+            a_1 & a_2 & a_3\\
+            a_2 & a_3 & a_4\\
+            a_3 & a_4 & a_5\\
+        \end{matrix}
+    \right]
+\end{equation}
+
+代入$a$得到：
+\begin{equation}
+    \left[
+        \begin{matrix}
+            0&1&0
+        \end{matrix}
+    \right]
+    =
+    \left[
+        \begin{matrix}
+            c_3&c_2&c_1
+        \end{matrix}
+    \right]
+    \left[
+        \begin{matrix}
+            1 &1 &1\\
+            1 &1 &0\\
+            1 &0 &1\\
+        \end{matrix}
+    \right]
+\end{equation}
+
+因此可得到下式（计算通过Matlab）：
+\begin{equation}
+    \left[
+        \begin{matrix}
+            c_3&c_2&c_1
+        \end{matrix}
+    \right]
+    =
+    \left[
+        \begin{matrix}
+            0&1&0
+        \end{matrix}
+    \right]
+    \left[
+        \begin{matrix}
+            1 &1 &1\\
+            1 &1 &0\\
+            1 &0 &1\\
+        \end{matrix}
+    \right]^{-1}
+    =    \left[
+        \begin{matrix}
+            1&0&1
+        \end{matrix}
+    \right]
+\end{equation}
+
+又由序列递推关系：
+\begin{equation}
+    a_{h+3} = c_1 a_{h+2} \oplus c_2 a_{h+1} \oplus c_3 a_{h}
+\end{equation}
+
+得到密钥流的递推关系为：
+\begin{equation}
+    a_{h+3} = a_{h+2} \oplus a_{h}
+\end{equation}
+
+\section{DES穷尽搜索}
+
+\textbf{题目}:1) 设$M^{\prime}$是$M$的逐比特取补，证明在 DES 中，如果对明文分组和加
+密密钥都逐比特取补，那么得到的密文也是原密文的逐比特取补，即：
+
+如果 $Y = DES(k, X)$
+
+那么 $Y^{\prime} = DES(k^{\prime}, X^{\prime})$。
+
+\textbf{解答}:由于在DES中置换、密钥分组无论输入如何都有相同的表现，因此在输入中被取补的bit将在
+输出中被取补。因此只需要考虑DES中的16轮迭代运算。
+
+假设$i$轮后得到$L_i^{\prime}, R_i^{\prime}$，则其上一轮为$L_{i-1}^{\prime}, R_{i-1}^{\prime}$
+并使用密钥$k_{i-1}^{\prime}$加密。
+
+由$L_i=R_{i-1}$，可得：
+\begin{equation}
+    L_i^{\prime} = R_{i-1}^{\prime}
+\end{equation}
+
+由$R_i = L_{i-1} \oplus f(R_{i-1}, k_{i-1})$可得：
+\begin{equation}
+    R_i^{\prime} = L_{i-1}^{\prime} \oplus f(R_{i-1}^{\prime}, k_{i-1}^{\prime})
+\end{equation}
+
+由于在轮函数$f$中两参数异或，有$f(R,k)=f(R^{\prime},k^{\prime})$，因此进一步化为：
+\begin{equation}
+    \begin{aligned}
+        R_i^{\prime}    &= L_{i-1}^{\prime} \oplus f(R_{i-1}, k_{i-1})\\
+                        &= (L_{i-1} \oplus f(R_{i-1}, k_{i-1}))^{\prime}\\
+                        &= R_i
+    \end{aligned}
+\end{equation}
+
+因此在16轮迭代后得到的bit串恰为原来的补，而开始和最后的置换不改变补关系，因此有：
+\begin{equation}
+    Y^{\prime} = DES(k^{\prime}, X^{\prime})
+\end{equation}
+
+证毕。
+
+\textbf{题目}:2) 对 DES 进行穷尽搜索攻击时，需要在由$2^{56}$个密钥构成的密钥空间
+进行。能否根据上述结论减小搜索所用的密钥空间大小，进而优化穷尽搜索
+效率。
+
+\textbf{解答}:由上述结论可知，在进行CPA时只需将原来的判断条件$y = DES(k, x)$更改为
+$y = DES(k, x)~or~y = DES(k, x)^{\prime}$即可。
+
+根据补运算的性质，可将原密钥空间$\mathcal{K}$进行划分，划分后的子空间$\mathcal{K}_1,\mathcal{K}_2$满足：
+\begin{itemize}
+    \item $\mathcal{K}_1\cup \mathcal{K}_2 = \mathcal{K}$
+    \item $|\mathcal{K}_1|=|\mathcal{K}_2|$
+    \item $\forall k_1, k_2 \in \mathcal{K}_i, i = 0, 1$满足$k_1 \neq k_2^{\prime}$
+    \item $\forall k_1 \in \mathcal{K}_i, i = 0, 1$，$\exists k_2 \in \mathcal{K}_{i^\prime}$使得$k_1 = k_2^{\prime}$
+\end{itemize}
+
+因此优化后的密钥空间大小$|\mathcal{K}_1| = |\mathcal{K}| / 2 = 2^{55}$
