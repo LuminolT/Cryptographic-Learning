@@ -20,8 +20,8 @@ def get_table(n):
         print('')
 
 def main():
-    get_table(5)
-    get_table(6)
+    get_table(7)
+    get_table(8)
 
 if __name__ == '__main__':
     main()

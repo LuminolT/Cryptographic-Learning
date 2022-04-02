@@ -1,0 +1,404 @@
+\chapter{第一周作业}
+
+\newpage
+\chapter{第二周作业}
+
+\section{第3题}
+
+\textbf{题目}：考察$\mathbb{Z}_2[x]$中的多项式$f_1(x)=x^3+x+1$和$f_2(x)=x^3+1$，
+
+
+(1) 判断$f_1(x),f_2(x)$哪个是$\mathbb{Z}_2[x]$上的不可约多项式；
+
+\begin{Solution}
+    $\mathbb{Z}_2[x]$中的一次因式有：$x,x-1$，则有：
+    \begin{equation}
+        \begin{aligned}
+            f_1(0) = 1, f_1(1) = 1\\
+            f_2(0) = 1, f_2(1) = 0\\
+        \end{aligned}
+    \end{equation}
+    
+    由余元定理的推论可知：$(x-1)|f_2(x)$，而$f_1(x)$无$\mathbb{Z}_2[x]$上的一次因式。
+    
+    $\therefore f_1(x)$为$\mathbb{Z}_2[x]$上的不可约多项式，$f_2(x)$为$\mathbb{Z}_2[x]$上的既约多项式。
+\end{Solution}
+
+(2) 将找到的不可约多项式记为$f(x)$，写出$\mathbb{Z}_2[x]$关于模$f(x)$的剩余类$\mathbb{Z}_2[x]_{f(x)}$的全部元素；
+
+\begin{Solution}
+    由(1)，$f(x)=f_1(x)=x^3+x+1$，$\partial^o(f(x))=3$
+    
+    因此剩余类中多项式$r(x)$满足$0\le \partial^o(r(x)) < 3$，因此模$f(x)$剩余类为：
+    \begin{equation}
+        \mathbb{Z}_2[x]_{f(x)} = \left\{ax^2+bx+c|a,b,c \in \{0,1\}\right\}
+    \end{equation}
+\end{Solution}
+
+(3) 在集合$\mathbb{Z}_2[x]_{f(x)}$上定义加法运算$\oplus$和乘法运算$\otimes$分别为：
+\begin{equation}
+    \begin{aligned}
+        a(x) \oplus b(x) = a(x) + b(x) \\
+        a(x) \otimes b(x) = (a(x)b(x))_{f(x)}
+    \end{aligned}
+\end{equation}
+
+请求出$(x+1)\oplus(x^2+x+1)$和$(x+1)\otimes(x^2+x+1)$的值；
+
+\begin{Solution}
+    根据给定的运算，得到：
+    \begin{equation}
+        \begin{aligned}
+            (x+1)\oplus(x^2+x+1)    &= (x+1)+(x^2+x+1)\\
+                                    &= x^2 + 2x + 2\\
+                                    &= x^2
+        \end{aligned}
+    \end{equation}
+    \begin{equation}
+        \begin{aligned}
+        (x+1)\otimes(x^2+x+1)   &= ((x+1)(x^2+x+1)) \bmod f(x)\\
+                                &= (x^3+x^2+x+x^2+x+1) \bmod f(x)\\
+                                &= (x^3+2x^2+2x+1) \bmod f(x)\\
+                                &= (x^3 +2x^2+ 1) \bmod (f(x))\\
+                                &= x
+        \end{aligned}
+    \end{equation}
+\end{Solution}
+
+(4) 求出$x+1$关于乘法运算$\otimes$的逆元。
+
+\begin{Solution}
+    用欧几里得算法计算$f(x)$和$x+1$的最大公因式：
+    \begin{equation}
+        \begin{aligned}
+            f(x) &= (x^2 + x)(x+1) + 1\\
+            x+1 &= (x+1) * 1 + 0\\
+        \end{aligned}
+    \end{equation}
+
+    $\therefore gcd(f(x), x+1) = x+1$，进一步得到$1=f(x)+(x^2+x)(x+1)$
+
+    $\therefore (x+1)(x^2+x) \equiv 1 (\bmod f(x))$
+
+    $\therefore (x+1)^{-1} \equiv x^2+x (\bmod f(x))$
+
+    即$x+1$关于乘法运算$\otimes$的逆元是$x^2+x$.
+\end{Solution}
+
+\newpage
+\chapter{第三周作业}
+
+\section{第4题}
+
+\textbf{题目}：设$p=7$，用$\mathbb{Z}_7$来记所有整数集合$\mathbb{Z}$模$7$的等价类的集合，在$\mathbb{Z}_7$上定义加法运算$\oplus$
+和乘法运算分别为：
+\begin{equation}
+    \begin{aligned}
+        a \oplus b= (a+b)_7\\
+        a \otimes b = (ab)_7\\
+    \end{aligned}
+\end{equation}
+
+(1) 写出模$7$等价类的集合$\mathbb{Z}_7$的全部元素；
+
+\begin{Solution}
+    $\mathbb{Z}_7 = \left\{0,1,2,3,4,5,6\right\}$
+\end{Solution}
+
+(2) 请列出$\mathbb{Z}_7$关于$\oplus,\otimes$这两种运算的运算表；
+
+\begin{Solution}
+    如下表所示：
+
+    \begin{minipage}[t]{0.45\linewidth}
+            \centering
+            \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_7$上$\oplus$运算表}
+            \begin{tabular}{|c|c|c|c|c|c|c|c|}
+            \hline
+            $\oplus$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+            0        & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+            1        & 1 & 2 & 3 & 4 & 5 & 6 & 0 \\ \hline
+            2        & 2 & 3 & 4 & 5 & 6 & 0 & 1 \\ \hline
+            3        & 3 & 4 & 5 & 6 & 0 & 1 & 2 \\ \hline
+            4        & 4 & 5 & 6 & 0 & 1 & 2 & 3 \\ \hline
+            5        & 5 & 6 & 0 & 1 & 2 & 3 & 4 \\ \hline
+            6        & 6 & 0 & 1 & 2 & 3 & 4 & 5 \\ \hline
+            \end{tabular}
+    \end{minipage}%
+    \begin{minipage}[t]{0.45\linewidth}
+            \centering
+            \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_7$上$\otimes$运算表}
+            \begin{tabular}{|c|c|c|c|c|c|c|c|}
+            \hline
+            $\otimes$ & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+            0        & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\ \hline
+            1        & 0 & 1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+            2        & 0 & 2 & 4 & 6 & 1 & 3 & 5 \\ \hline
+            3        & 0 & 3 & 6 & 2 & 5 & 1 & 4 \\ \hline
+            4        & 0 & 4 & 1 & 5 & 2 & 6 & 3 \\ \hline
+            5        & 0 & 5 & 3 & 1 & 6 & 4 & 2 \\ \hline
+            6        & 0 & 6 & 5 & 4 & 3 & 2 & 1 \\ \hline
+            \end{tabular}
+    \end{minipage}
+    \\
+\end{Solution}
+
+
+    
+
+(3) 试从域的定义出发验证$<\mathbb{Z}_7, \oplus, \otimes>$是一个有限域。
+
+\begin{Solution}
+    $<\mathbb{Z}_7, \oplus>$显然为Abel群，
+    $7$是素数，因此$<\mathbb{Z}_7-\{0\}, \otimes>$也是Abel群，
+    且对环$<\mathbb{Z}_7, \oplus, \otimes>$上元素$a,b,c$，满足：
+    \begin{equation}
+        \begin{aligned}
+            a\otimes (b\oplus c)    & = (a ((b + c) \bmod 7)) \bmod 7 \\
+                                    & = ((a \bmod 7)  ((b \bmod 7 + c \bmod 7) \bmod 7)) \bmod 7 \\
+                                    & = (((a \bmod 7)(b \bmod 7) \bmod 7 + (a \bmod 7)(c \bmod 7) \bmod 7) \bmod 7 \\
+                                    & = (((ab) \bmod 7)+((ac) \bmod 7)) \bmod 7\\
+                                    & = ((a \otimes b) + (a \otimes c)) \bmod 7\\
+                                    & = (a\otimes b) \oplus (a\otimes c)
+        \end{aligned}
+    \end{equation}
+
+    即$<\mathbb{Z}_7, \oplus, \otimes>$中$\otimes$对$\oplus$满足左分配律，又乘法群为Abel群，因此可得：
+    \begin{equation}
+        (b\oplus c) \otimes a =  (b\otimes a) \oplus (c\otimes a)
+    \end{equation}
+
+    因此环$<\mathbb{Z}_7, \oplus, \otimes>$满足分配律，因此$<\mathbb{Z}_7, \oplus, \otimes>$是域。
+
+    （事实上对素数$p$，同理可证明$<\mathbb{Z}_p, \oplus, \otimes>$为有限域）
+\end{Solution}
+
+\section{第5题}
+
+用$\mathbb{Z}_8$来记所有整数集合$\mathbb{Z}$模$8$的等价类的集合，在$\mathbb{Z}_8$上定义加法运算$\oplus$
+和乘法运算分别为：
+
+\begin{equation}
+    \begin{aligned}
+        a \oplus b= (a+b)_8\\
+        a \otimes b = (ab)_8\\
+    \end{aligned}
+\end{equation}
+
+(1) 写出模$8$等价类的集合$\mathbb{Z}_8$的全部元素；
+
+\begin{Solution}
+    $\mathbb{Z}_8 = \left\{0,1,2,3,4,5,6,7\right\}$
+\end{Solution}
+
+(2) 请列出$\mathbb{Z}_8$关于$\oplus,\otimes$这两种运算的运算表；
+
+\begin{Solution}
+    如下表所示：
+
+\begin{minipage}[t]{0.45\linewidth}
+        \centering
+        \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_8$上$\oplus$运算表}
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+        $\oplus$  & 0 &  1  & 2  & 3  & 4  & 5  & 6  & 7\\ \hline
+        0  & 0 &  1  & 2  & 3  & 4  & 5  & 6  & 7\\ \hline
+        1  & 1 &  2  & 3  & 4  & 5  & 6  & 7  & 0\\ \hline
+        2  & 2 &  3  & 4  & 5  & 6  & 7  & 0  & 1\\ \hline
+        3  & 3 &  4  & 5  & 6  & 7  & 0  & 1  & 2\\ \hline
+        4  & 4 &  5  & 6  & 7  & 0  & 1  & 2  & 3\\ \hline
+        5  & 5 &  6  & 7  & 0  & 1  & 2  & 3  & 4\\ \hline
+        6  & 6 &  7  & 0  & 1  & 2  & 3  & 4  & 5\\ \hline
+        7  & 7 &  0  & 1  & 2  & 3  & 4  & 5  & 6\\ \hline
+        \end{tabular}
+\end{minipage}%
+\begin{minipage}[t]{0.45\linewidth}
+        \centering
+        \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_8$上$\otimes$运算表}
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+        $\otimes$  & 0  & 1  & 2 &  3 &  4 &  5 &  6 &  7\\ \hline
+        0  & 0  & 0  & 0 &  0 &  0 &  0 &  0 &  0\\ \hline
+        1  & 0  & 1  & 2 &  3 &  4 &  5 &  6 &  7\\ \hline
+        2  & 0  & 2  & 4 &  6 &  0 &  2 &  4 &  6\\ \hline
+        3  & 0  & 3  & 6 &  1 &  4 &  7 &  2 &  5\\ \hline
+        4  & 0  & 4  & 0 &  4 &  0 &  4 &  0 &  4\\ \hline
+        5  & 0  & 5  & 2 &  7 &  4 &  1 &  6 &  3\\ \hline
+        6  & 0  & 6  & 4 &  2 &  0 &  6 &  4 &  2\\ \hline
+        7  & 0  & 7  & 6 &  5 &  4 &  3 &  2 &  1\\ \hline
+        \end{tabular}
+\end{minipage}
+\\
+\end{Solution}
+
+(3) 试从域的定义出发验证$<\mathbb{Z}_8, \oplus, \otimes>$不是一个有限域。
+
+\begin{Solution}
+    根据上述$\mathbb{Z}_8$上$\otimes$运算表发现，$2\otimes 4 =0$
+因此显然代数系统$<\mathbb{Z}_8-\{0\}, \otimes>$不构成群，因此$<\mathbb{Z}_8, \oplus, \otimes>$不是一个有限域。
+\end{Solution}
+
+\newpage
+\section{第6题}
+比较第4题和第5题，想一想为什么第4题的7个元素不能构成有限域而第5题的8个元素能构成有限域。他们的运算有什么不同。
+
+\begin{Solution}
+    在第4题最后笔者给出了对素数$p$，同理可证明$<\mathbb{Z}_p, \oplus, \otimes>$为有限域。
+
+    下面证明对于合数$n$，一定有$<\mathbb{Z}_n, \oplus, \otimes>$不是一个有限域。
+
+    给定$n = p_1p_2\cdots p_m$，其中$p_i(1\le i \le m)$为素数。
+    
+    则取$p_1,\prod_{i=2}^mp_i\in <\mathbb{Z}_n - \{0\}, \otimes>$，显然有$p_1\otimes\prod_{i=2}^mp_i = n \bmod n = 0$
+
+    而$0\notin <\mathbb{Z}_n - \{0\}, \otimes>$，该代数系统不封闭。
+    
+    因此$<\mathbb{Z}_n, \oplus, \otimes>$不是一个有限域。
+
+    综上所述$<\mathbb{Z}_n, \oplus, \otimes>$是一个有限域当且仅当$n$为素数
+\end{Solution}
+
+\newpage
+\chapter{第四周作业}
+\section{第7题}
+设$p=5$，考察$\mathbb{Z}_5[x]$中多项式
+\begin{equation}
+    p(x) = x^2 + 2
+\end{equation}
+
+(1) 试说明$p(x)$是$\mathbb{Z}_5[x]$上的不可约多项式；
+
+\begin{Solution}
+    $\mathbb{Z}_5[x]$中的一次因式有：$x,x-1,\cdots,x-4$，则有：
+    \begin{equation}
+        p(0) = 2, p(1) = 3, p(2) = 1, p(3) = 1, p(4) = 3
+    \end{equation}
+    
+    由余元定理的推论可知：$p(x)$无$\mathbb{Z}_5[x]$上的一次因式。
+
+    因此$p(x)$是$\mathbb{Z}_5[x]$上的不可约多项式。
+\end{Solution}
+
+(2) $\mathbb{Z}_5[x]_{p(x)}$是含有$5^2=25$个元素的集合，试写出$\mathbb{Z}_5[x]_{p(x)}$的全部元素；
+
+\begin{Solution}
+    $\partial^o(p(x))=2$
+    ，则剩余类中多项式$r(x)$满足$0\le \partial^o(r(x)) < 2$，因此：
+    \begin{equation}
+        \begin{aligned}
+            &\mathbb{Z}_5[x]_{f(x)} = \left\{ax+b|a,b \in \mathbb{Z}_5\right\}\\
+            =&\{0,1,2,3,4,
+                        x,x+1,x+2,x+3,x+4,
+                        2x+1,2x+2,2x+3,2x+4,\\
+                        &3x+1,3x+2,3x+3,3x+4,
+                        4x+1,4x+2,4x+3,4x+4\}
+        \end{aligned}
+    \end{equation}
+\end{Solution}
+
+(3) 在$\mathbb{Z}_5[x]_{p(x)}$上定义加法运算$\oplus$和乘法运算$\otimes$分别为：
+\begin{equation}
+    \begin{aligned}
+        a(x) \oplus b(x) = a(x) + b(x)\\
+        a(x) \otimes b(x) = (a(x)b(x))_{p(x)}
+    \end{aligned}
+\end{equation}
+
+请求出$(x+2)\oplus(3x+4)$和$(x+2)\otimes(3x+4)$的值。
+
+\begin{Solution}
+    \begin{equation}
+        \begin{aligned}
+            (x+2)\oplus(3x+4)   &= (x+2) + (3x+4)
+                                = 4x + 6\\
+                                &= 4x + 1
+        \end{aligned}
+    \end{equation}
+    \begin{equation}
+        \begin{aligned}
+            (x+2)\otimes(3x+4)  &= ((x+2)(3x+4)) \bmod p(x) = (3x^2 + 4x + 6x + 8) \bmod p(x)\\
+                                &= 10x + 2 \\
+                                &= 2
+        \end{aligned}
+    \end{equation}
+\end{Solution}
+
+
+\section{第8题}
+设$p=2$，考察$\mathbb{Z}_2[x]$中多项式
+\begin{equation}
+    p(x) = x^3 + x + 1
+\end{equation}
+
+(1) 试说明$p(x)$是$\mathbb{Z}_2[x]$上的不可约多项式；
+
+\begin{Solution}
+    $\mathbb{Z}_2[x]$中的一次因式有：$x,x-1$，则有：
+    \begin{equation}
+        p(0) = 1, p(1) = 1
+    \end{equation}
+    
+    由余元定理的推论可知：$p(x)$无$\mathbb{Z}_2[x]$上的一次因式。
+
+    因此$p(x)$是$\mathbb{Z}_2[x]$上的不可约多项式。
+\end{Solution}
+
+(2) $\mathbb{Z}_2[x]_{p(x)}$是含有$2^3=25$个元素的集合，试写出$\mathbb{Z}_2[x]_{p(x)}$的全部元素；
+
+\begin{Solution}
+    $\partial^o(p(x))=3$
+    ，则剩余类中多项式$r(x)$满足$0\le \partial^o(r(x)) < 3$，因此：
+    \begin{equation}
+        \begin{aligned}
+            &\mathbb{Z}_2[x]_{f(x)} = \left\{ax^2+bx+c|a,b,c \in \mathbb{Z}_2\right\}\\
+            =&\{0,1,x,x+1,x^2,x^2+1,x^2+x,x^2+x+1\}
+        \end{aligned}
+    \end{equation}
+\end{Solution}
+
+(3) 在$\mathbb{Z}_2[x]_{p(x)}$上定义加法运算$\oplus$和乘法运算$\otimes$分别为：
+\begin{equation}
+    \begin{aligned}
+        a(x) \oplus b(x) = a(x) + b(x)\\
+        a(x) \otimes b(x) = (a(x)b(x))_{p(x)}
+    \end{aligned}
+\end{equation}
+
+请列出$\mathbb{Z}_2[x]_{p(x)}$关于$\oplus$和$\otimes$这两种运算的运算表。
+
+\begin{Solution}
+    由于$\mathbb{Z}_2[x]_{p(x)}\cong\mathbb{Z}_{2^3} = \mathbb{Z}_{8}$，可直接利用$\mathbb{Z}_{8}$的运算表（第5题已得到）
+    
+    记$f_i(x) = ax^2+bx+c, i = 4a + 2b + c$，给出运算表如下表所示
+    
+        \centering
+        \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_2[x]_{p(x)}$上$\oplus$运算表}
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+        $\oplus$  & $f_0(x)$ &  $f_1(x)$  & $f_2(x)$  & $f_3(x)$  & $f_4(x)$  & $f_5(x)$  & $f_6(x)$  & $f_7(x)$\\ \hline
+        $f_0(x)$  & $f_0(x)$ &  $f_1(x)$  & $f_2(x)$  & $f_3(x)$  & $f_4(x)$  & $f_5(x)$  & $f_6(x)$  & $f_7(x)$\\ \hline
+        $f_1(x)$  & $f_1(x)$ &  $f_2(x)$  & $f_3(x)$  & $f_4(x)$  & $f_5(x)$  & $f_6(x)$  & $f_7(x)$  & $f_0(x)$\\ \hline
+        $f_2(x)$  & $f_2(x)$ &  $f_3(x)$  & $f_4(x)$  & $f_5(x)$  & $f_6(x)$  & $f_7(x)$  & $f_0(x)$  & $f_1(x)$\\ \hline
+        $f_3(x)$  & $f_3(x)$ &  $f_4(x)$  & $f_5(x)$  & $f_6(x)$  & $f_7(x)$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$\\ \hline
+        $f_4(x)$  & $f_4(x)$ &  $f_5(x)$  & $f_6(x)$  & $f_7(x)$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$  & $f_3(x)$\\ \hline
+        $f_5(x)$  & $f_5(x)$ &  $f_6(x)$  & $f_7(x)$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$  & $f_3(x)$  & $f_4(x)$\\ \hline
+        $f_6(x)$  & $f_6(x)$ &  $f_7(x)$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$  & $f_3(x)$  & $f_4(x)$  & $f_5(x)$\\ \hline
+        $f_7(x)$  & $f_7(x)$ &  $f_0(x)$  & $f_1(x)$  & $f_2(x)$  & $f_3(x)$  & $f_4(x)$  & $f_5(x)$  & $f_6(x)$\\ \hline
+        \end{tabular}
+
+        \centering
+        \makeatletter\def\@captype{table}\makeatother\caption{$\mathbb{Z}_2[x]_{p(x)}$上$\otimes$运算表}
+        \begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+        \hline
+        $\otimes$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$ &  $f_3(x)$ &  $f_4(x)$ &  $f_5(x)$ &  $f_6(x)$ &  $f_7(x)$\\ \hline
+        $f_0(x)$  & $f_0(x)$  & $f_0(x)$  & $f_0(x)$ &  $f_0(x)$ &  $f_0(x)$ &  $f_0(x)$ &  $f_0(x)$ &  $f_0(x)$\\ \hline
+        $f_1(x)$  & $f_0(x)$  & $f_1(x)$  & $f_2(x)$ &  $f_3(x)$ &  $f_4(x)$ &  $f_5(x)$ &  $f_6(x)$ &  $f_7(x)$\\ \hline
+        $f_2(x)$  & $f_0(x)$  & $f_2(x)$  & $f_4(x)$ &  $f_6(x)$ &  $f_0(x)$ &  $f_2(x)$ &  $f_4(x)$ &  $f_6(x)$\\ \hline
+        $f_3(x)$  & $f_0(x)$  & $f_3(x)$  & $f_6(x)$ &  $f_1(x)$ &  $f_4(x)$ &  $f_7(x)$ &  $f_2(x)$ &  $f_5(x)$\\ \hline
+        $f_4(x)$  & $f_0(x)$  & $f_4(x)$  & $f_0(x)$ &  $f_4(x)$ &  $f_0(x)$ &  $f_4(x)$ &  $f_0(x)$ &  $f_4(x)$\\ \hline
+        $f_5(x)$  & $f_0(x)$  & $f_5(x)$  & $f_2(x)$ &  $f_7(x)$ &  $f_4(x)$ &  $f_1(x)$ &  $f_6(x)$ &  $f_3(x)$\\ \hline
+        $f_6(x)$  & $f_0(x)$  & $f_6(x)$  & $f_4(x)$ &  $f_2(x)$ &  $f_0(x)$ &  $f_6(x)$ &  $f_4(x)$ &  $f_2(x)$\\ \hline
+        $f_7(x)$  & $f_0(x)$  & $f_7(x)$  & $f_6(x)$ &  $f_5(x)$ &  $f_4(x)$ &  $f_3(x)$ &  $f_2(x)$ &  $f_1(x)$\\ \hline
+        \end{tabular}
+\\
+\end{Solution}
