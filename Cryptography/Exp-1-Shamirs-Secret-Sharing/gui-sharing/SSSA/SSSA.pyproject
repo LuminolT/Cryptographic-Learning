@@ -1,0 +1,3 @@
+{
+    "files": ["utils.py","form.ui","widget.py","shamir.py"]
+}

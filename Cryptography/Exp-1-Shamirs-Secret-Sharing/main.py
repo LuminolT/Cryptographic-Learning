@@ -16,6 +16,9 @@ l = Shamir.split(3, 5, '12345'.encode())
 for idx, item in l:
     print("Share {}: {}".format(str(idx), hexlify(item)))
 
-secret = Shamir.combine(l[0:3])
+shares = l[1:4]
+
+secret = Shamir.combine(shares)
+
 
 print(f'Secret is : {secret.decode()}')
