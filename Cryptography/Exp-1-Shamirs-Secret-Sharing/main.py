@@ -3,13 +3,13 @@ import matplotlib.pyplot as plt
 from shamir import *
 from binascii import hexlify
 
-img = plt.imread('cat.png')
-plt.imshow(img)
-plt.show()
+# img = plt.imread('cat.png')
+# plt.imshow(img)
+# plt.show()
 
-# s = 'TEST_STRING'.encode()
+s = 'TEST_STRING'.encode()
 
-# print("Original secret:", hexlify(s))
+print("Original secret:", hexlify(s))
 
 l = Shamir.split(3, 5, '12345'.encode())
 
