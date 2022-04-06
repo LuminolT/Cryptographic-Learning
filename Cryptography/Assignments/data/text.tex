@@ -191,3 +191,102 @@ $y = DES(k, x)~or~y = DES(k, x)^{\prime}$即可。
 \end{itemize}
 
 因此优化后的密钥空间大小$|\mathcal{K}_1| = |\mathcal{K}| / 2 = 2^{55}$
+
+\newpage
+
+\chapter{第三次作业}
+
+\section{伪随机函数与伪随机数生成器}
+
+\textbf{题目}：令$G$是一个安全的伪随机数生成器（Pseudo Random Generator），
+$G_0(s)$表示当输入$s \in\{0, 1\}^n$时$G$的输出。定义函数$F(k, x) = G_0(k) \oplus x$。
+证明$F$不是一个伪随机函数（Pseudo Random Function）。
+
+\begin{Solution}
+    根据异或运算性质得到给定PRF有$F:\mathcal{K}\times X \rightarrow X$
+    
+    下面根据PRF定义模型，构造攻击使得其优势不可忽略。
+
+    取$\forall x_1, x_2 \in X, x_1 \neq x_2$，
+
+    在一次实验中给定两个质询$x_1, x_2$，得到$y_1=f(x_1), y_2=f(x_2)$。
+
+    若$b=0$则$f:=F(k,x) = G_0(k) \oplus x$，则有：
+    \begin{equation}
+        \begin{aligned}
+            y_1 \oplus y_2  &= G_0(k) \oplus x_1 \oplus G_0(k) \oplus x_2\\
+                            &= x_1 \oplus x_2
+        \end{aligned}
+    \end{equation}
+
+    因此我们给定策略：
+    
+    当质询结果$y_1 \oplus y_2 = x_1 \oplus x_2$，认为是实验0（即$b=0$），
+    反之则认为是实验1（即$b=1$，此时由真PRF产生结果）
+
+    若$b=0$，可得到$\mathrm{Pr}[EXP(0)=1] = 1$
+
+    若$b=1$，可得到$\mathrm{Pr}[EXP(1)=1] = 1/2^{|X|} = 1/2^{n}$
+    
+    计算优势：
+    \begin{equation}
+        \begin{aligned}
+            \mathrm{Adv_{PRF}}[A, F]    &= |\mathrm{Pr}[EXP(0)=1] - \mathrm{Pr}[EXP(1)=1]|\\
+                                        &= 1 - \frac{1}{2^n}
+        \end{aligned}
+    \end{equation}
+
+    显然，该优势是不可忽略的，因此该PRF不安全，即$F$不是一个伪随机函数。
+    
+\end{Solution}
+
+
+\newpage
+\section{选择明文攻击}
+
+\textbf{题目}：考虑 CBC 分组加密的一个变种：定义初始向量 IV 为逐渐递增的计数
+器（而不是随机选取 IV）。证明上述变种不满足多次使用密钥场景下选择明
+文攻击（CPA）安全性。\footnote{建议参考 ppt 第 41 页}
+
+\begin{Solution}
+    参考PPT中的攻击方式：
+
+    第一次质询：发送$m_0=m_1=0\in X$，得到相同质询结果：
+    \begin{equation}
+        c_1 = [IV_1, E(k, 0\oplus IV_1)] = [IV_1, E(k, IV_1)]
+    \end{equation}
+    由于 IV采用计数器选取，可预测下一次质询的初始向量为：
+    \begin{equation}
+        IV_2 = IV_1 + 1
+    \end{equation}
+
+    第二次质询：发送$m_0 = IV_1 \oplus IV_2, m_1 \neq m_0$
+
+    得到质询结果为：
+    \begin{equation}
+        c_2 = \left\{
+        \begin{aligned}
+            &[IV_2, E(k,m_0 \oplus IV_2)] = [IV_2, E(k, IV_1)] &, case0\\
+            &[IV_2, E(k,m_1\oplus IV_2)]    &,case1
+        \end{aligned}
+        \right.
+    \end{equation}
+
+    观察发现$case0$中$c_1[1] = c_2[1]$，因此可判断，当第二次质询结果$c_2[1]=c_1[1]$时，
+    认为是实验0（即$b=0$），反之则认为是实验1（即$b=1$）。
+
+    若$b=0$，可得到$\mathrm{Pr}[EXP(0)=1] = 1$
+
+    若$b=1$，由于选取$m_1 \neq m_0$，加密结果必然不同，可得到$\mathrm{Pr}[EXP(1)=1] = 0$
+
+    计算优势：
+    \begin{equation}
+        \begin{aligned}
+            \mathrm{Adv_{CBC'}}[A, E_{\mathrm{CBC}}]    &= |\mathrm{Pr}[EXP(0)=1] - \mathrm{Pr}[EXP(1)=1]|\\
+                                        &= 1
+        \end{aligned}
+    \end{equation}
+
+    显然，该优势是不可忽略的，因此该加密方案不满足多次使用密钥场景下的CPA安全性。
+    
+\end{Solution}
