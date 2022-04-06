@@ -1,6 +1,6 @@
 import binascii
 from Crypto.Cipher import AES
-from cxc_toolkit import byte, integer
+from cxc_toolkit import integer
 
 def byte_xor(a: bytes, b: bytes) -> bytes:
     '''
@@ -10,6 +10,29 @@ def byte_xor(a: bytes, b: bytes) -> bytes:
         return bytes([x ^ y for x, y in zip(a[:len(b)], b)])
     else:
         return bytes([x ^ y for x, y in zip(a, b[:len(a)])])
+
+def to_int(byte):
+    """
+    Convert bytes to int
+
+    :type byte: bytes
+    :rtype: int
+    """
+    s = 0
+    for i, number in enumerate(byte):
+        s = s * 256 + number
+    return s
+
+
+def byte_add(byte, addtions):
+    """
+    Add int to bytes
+
+    :type byte: bytes
+    :type addtions: int
+    :rtype: bytes
+    """
+    return integer.to_bytes(to_int(byte) + addtions, bytes_size=len(byte))
 
 def msg_block_generator(msg, padding=False):
         while len(msg) >= 16:
@@ -68,8 +91,8 @@ class CTR:
         cipher = AES.new(key, AES.MODE_ECB)
         ciphertext = b''
         for i, msg_block in enumerate(msg_block_generator(msg, padding=False)):
-            cipher_block = cipher.encrypt(byte.add(iv, i))
-            cipher_block = byte.xor(msg_block, cipher_block)
+            cipher_block = cipher.encrypt(byte_add(iv, i))
+            cipher_block = byte_xor(msg_block, cipher_block)
             ciphertext += cipher_block
         return ciphertext
 
@@ -78,7 +101,7 @@ class CTR:
         cipher = AES.new(key, AES.MODE_ECB)
         msg = b''
         for i, cipher_block in enumerate(cipher_block_generator(cipher_text)):
-            iv_encrypted = cipher.encrypt(byte.add(iv, i))
-            msg_block = byte.xor(cipher_block, iv_encrypted)
+            iv_encrypted = cipher.encrypt(byte_add(iv, i))
+            msg_block = byte_xor(cipher_block, iv_encrypted)
             msg += msg_block
         return msg
