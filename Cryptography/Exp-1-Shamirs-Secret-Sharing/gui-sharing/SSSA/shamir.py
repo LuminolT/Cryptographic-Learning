@@ -134,7 +134,7 @@ class Shamir(object):
     """
 
     @staticmethod
-    def split(k, n, secret, ssss=False):
+    def split(k, n, secret):
         """Split a secret into ``n`` shares.
 
         The secret can be reconstructed later using just ``k`` shares
@@ -151,9 +151,6 @@ class Shamir(object):
             The number of shares that this method will create.
           secret (byte string):
             A byte string of 16 bytes (e.g. the AES 128 key).
-          ssss (bool):
-            If ``True``, the shares can be used with the ``ssss`` utility.
-            Default: ``False``.
 
         Return (tuples):
             ``n`` tuples. A tuple is meant for each participant and it contains two items:
@@ -176,19 +173,18 @@ class Shamir(object):
         # Each share is y_i = p(x_i) where x_i is the public index
         # associated to each of the n users.
 
-        def make_share(user, coeffs, ssss):
+        def make_share(user, coeffs):
             idx = _Element(user)
             share = _Element(0)
             for coeff in coeffs:
                 share = idx * share + coeff
-            if ssss:
-                share += _Element(user) ** len(coeffs)
+
             return share.encode()
 
-        return [(i, make_share(i, coeffs, ssss)) for i in range(1, n + 1)]
+        return [(i, make_share(i, coeffs)) for i in range(1, n + 1)]
 
     @staticmethod
-    def combine(shares, ssss=False):
+    def combine(shares):
         """Recombine a secret, if enough shares are presented.
 
         Args:
@@ -226,8 +222,6 @@ class Shamir(object):
             value = _Element(x[1])
             if any(y[0] == idx for y in gf_shares):
                 raise ValueError("Duplicate share")
-            if ssss:
-                value += idx ** k
             gf_shares.append((idx, value))
 
         result = _Element(0)
@@ -244,27 +238,3 @@ class Shamir(object):
                     denominator *= x_j + x_m
             result += y_j * numerator * denominator.inverse()
         return result.encode()
-
-
-# from utils import *
-
-# class shamir:
-#     '''
-#     '''
-#     def split():
-#         '''
-#         '''
-#         pass
-    
-#     def reconstruct():
-#         '''
-#         '''
-#         pass
-
-
-# def main():
-#     pass
-
-# if __name__ == '__main__':
-#     main()
-
