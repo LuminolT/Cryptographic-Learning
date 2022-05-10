@@ -582,7 +582,6 @@ for i in range(15):
         order += 1
     print(f'{i}\'s order: {order}')
 \end{lstlisting}
-
 得到：
 
 \begin{itemize}
@@ -609,3 +608,190 @@ for i in range(15):
 
 本原多项式为：$m_1(x)=x^4 + x^3 + 1, m_7(x)=x^4 + x + 1$
 \end{Solution}
+
+\newpage
+\chapter{第六周作业}
+\section{第9题}
+将域$\mathbb{F}_3$上的$4\times 4$矩阵$\bm{A}$化为与之行等价的阶梯形矩阵$\bm{A}_0$，
+\begin{equation}
+    \bm{A} = \left(
+        \begin{smallmatrix}
+            1 &2 &0 &2\\
+            2 &1 &1 &0\\
+            2 &2 &1 &1\\
+            0 &1 &2 &2\\
+        \end{smallmatrix}
+    \right)
+\end{equation}
+并求出矩阵$\bm{A}$的秩。
+
+\begin{Solution}
+    由题意，对矩阵$\bm{A}$做如下初等行变换：\\
+
+    $
+    \begin{aligned}
+        \bm{A} &= \left(
+        \begin{smallmatrix}
+            1 &2 &0 &2\\
+            2 &1 &1 &0\\
+            2 &2 &1 &1\\
+            0 &1 &2 &2\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            2 &1 &0 &1\\
+            2 &1 &1 &0\\
+            2 &2 &1 &1\\
+            0 &1 &2 &2\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            2 &1 &0 &1\\
+            0 &0 &1 &2\\
+            0 &1 &1 &0\\
+            0 &1 &2 &2\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            2 &1 &0 &1\\
+            0 &1 &1 &0\\
+            0 &1 &2 &2\\
+            0 &0 &1 &2\\
+        \end{smallmatrix}
+    \right)\\
+    &\sim
+    \left(
+        \begin{smallmatrix}
+            2 &1 &0 &1\\
+            0 &1 &1 &0\\
+            0 &0 &1 &2\\
+            0 &0 &1 &2\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            2 &1 &0 &1\\
+            0 &1 &1 &0\\
+            0 &0 &1 &2\\
+            0 &0 &0 &0\\
+        \end{smallmatrix}
+    \right)= \bm{A}_0
+    \end{aligned} 
+    $\\
+
+    因此，$rank(\bm{A})=rank(\bm{A}_0) = 3$。
+\end{Solution}
+
+\section{第10题}
+将域$\mathbb{F}_2$上的$8\times 8$矩阵$\bm{A}$化为与之行等价的阶梯形矩阵$\bm{A}_0$，
+\begin{equation}
+    \bm{A} = \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            1 &0 &0 &0 &0 &0 &0 &0\\
+            0 &1 &0 &1 &0 &1 &0 &1\\
+            1 &1 &1 &1 &1 &1 &1 &0\\
+            1 &0 &0 &0 &0 &1 &1 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+        \end{smallmatrix}
+    \right)
+\end{equation}
+并求出矩阵$\bm{A}$的秩。
+
+\begin{Solution}
+    由题意，对矩阵$\bm{A}$做如下初等行变换：\\
+
+    $
+    \begin{aligned}
+        \bm{A} &= \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            1 &0 &0 &0 &0 &0 &0 &0\\
+            0 &1 &0 &1 &0 &1 &0 &1\\
+            1 &1 &1 &1 &1 &1 &1 &0\\
+            1 &0 &0 &0 &0 &1 &1 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            0 &0 &1 &1 &0 &1 &1 &0\\
+            0 &1 &0 &1 &0 &1 &0 &1\\
+            0 &1 &0 &0 &1 &0 &0 &0\\
+            0 &0 &1 &1 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+            0 &1 &0 &1 &0 &1 &0 &1\\
+            0 &1 &0 &0 &1 &0 &0 &0\\
+            0 &0 &1 &1 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &0 &1 &1 &0 &1 &1 &0\\
+        \end{smallmatrix}
+    \right)\\
+    &\sim
+    \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+            0 &0 &1 &1 &1 &1 &1 &1\\
+            0 &0 &1 &1 &0 &1 &1 &0\\
+            0 &0 &1 &0 &0 &0 &1 &0\\
+            0 &0 &1 &1 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+            0 &0 &1 &1 &1 &1 &1 &1\\
+            0 &0 &0 &0 &1 &0 &0 &1\\
+            0 &0 &0 &1 &1 &1 &0 &1\\
+            0 &0 &0 &0 &1 &1 &1 &0\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+        \end{smallmatrix}
+    \right)
+    \sim
+    \left(
+        \begin{smallmatrix}
+            1 &0 &1 &1 &0 &1 &1 &0\\
+            0 &1 &1 &0 &1 &0 &1 &0\\
+            0 &0 &1 &1 &1 &1 &1 &1\\
+            0 &0 &0 &1 &1 &1 &0 &1\\
+            0 &0 &0 &0 &1 &1 &1 &0\\
+            0 &0 &0 &0 &0 &1 &1 &1\\
+            0 &0 &0 &0 &0 &0 &0 &1\\
+            0 &0 &0 &0 &0 &0 &0 &0\\
+        \end{smallmatrix}
+    \right)=\bm{A_0}
+    \end{aligned}
+    $\\
+
+    因此，$rank(\bm{A})=rank(\bm{A}_0) = 7$。
+\end{Solution}
+\newpage
