@@ -402,3 +402,210 @@
         \end{tabular}
 \\
 \end{Solution}
+
+\newpage
+\chapter{研讨项目1（代数部分）——认识有限域$\mathrm{GF}(p^n)$}
+
+\textbf{目的}：掌握有限域$\mathrm{GF}(p^n)$的结构，以及有限域$\mathrm{GF}(p^n)$上的运算。
+
+\textbf{要求}：讨论有限域$\mathrm{GF}(p^n)$的构造方法，有限域$\mathrm{GF}(p^n)$加法结构和乘法结构，
+讨论有限域$\mathrm{GF}(p^n)$上的运算。
+
+
+在$\mathrm{GF}(2)=\left\{0,1\right\}$的系数域上，以$p(x)=x^4+x^3+1$为模构成有限域$\mathrm{GF}(2^4)$。
+
+(1) 有限域$\mathrm{GF}(2^4)$的特征；
+(2) 设$\alpha$为$p(x)$的根，并写出有限域$\mathrm{GF}(2^4)$中元素的四种表示；
+(3) 找出所有的共轭根组，并构成相应的最小多项式；
+(4) 将所有的最小多项式化简；
+(5) 将$x^{16}-x$因式分解；
+(6) 求出所有的本原元和本原多项式。
+
+
+
+\begin{Solution}
+(1) 根据域特征的定义可知，有限域$\mathrm{GF}(2^4)$的特征为$2$。
+
+(2) 由于$\mathrm{GF}(2^4)\cong \mathbb{Z}_2[x]/p(x)$，可记$\mathrm{GF}(2^4)\cong \left\{ax^3+bx^2+cx+d|a,b,c,d\in\mathbb{Z}_2\right\}$
+
+由于$x^4 (\bmod p(x)) = x^3 + 1$，可设$\alpha^4 = \alpha^3 + 1$，得到：\\
+
+{
+\centering
+\begin{tabular}{ccl}
+    \toprule
+    幂次表示 & 多项式表示 & 推导过程\\
+    \midrule
+    $0$ & $0$ &\\
+    $\alpha^0 = 1$ &$1$                                 &\\
+    $\alpha^1$&$\alpha$                                 &\\   
+    $\alpha^2$&$\alpha^2$                               &\\   
+    $\alpha^3$&$\alpha^3$                               &\\   
+    $\alpha^4$&$\alpha^3 + 1$                           &$\alpha^4 = \alpha^3 + 1$\\   
+    $\alpha^5$&$\alpha^3 + \alpha + 1$                  &$\alpha^{5} = \alpha^4\cdot\alpha = (\alpha^3 + 1)\alpha=\alpha^4 + \alpha$\\   
+    $\alpha^6$&$\alpha^3 + \alpha^2 + \alpha + 1$       & $\alpha^{6} = \alpha^5\cdot\alpha = (\alpha^3 + \alpha + 1)\alpha = \alpha^4 + \alpha^2 + \alpha$\\   
+    $\alpha^7$&$\alpha^2 + \alpha + 1$                  &$\alpha^{7} = \alpha^{6}\cdot\alpha = (\alpha^3 + \alpha^2 + \alpha + 1)\alpha = \alpha^4 + \alpha^3 + \alpha^2 + \alpha$\\   
+    $\alpha^8$&$\alpha^3 + \alpha^2 + \alpha$           &$\alpha^{8} = \alpha^{7}\cdot\alpha = (\alpha^2 + \alpha + 1)\alpha$\\   
+    $\alpha^9$&$\alpha^2 + 1$                           &$\alpha^{9} = \alpha^{8}\cdot\alpha = (\alpha^3 + \alpha^2 + \alpha) \alpha = \alpha^4 + \alpha^3 +\alpha^2$\\   
+    $\alpha^{10}$&$\alpha^3 + \alpha$                   &$\alpha^{10} = \alpha^9\cdot\alpha = (\alpha^2 + 1)\alpha$ \\       
+    $\alpha^{11}$&$\alpha^3 + \alpha^2 + 1$             &$\alpha^{11} = \alpha^{10}\cdot\alpha = (\alpha^3 + \alpha) \alpha = \alpha^4 + \alpha^2$\\       
+    $\alpha^{12}$&$\alpha + 1$                          &$\alpha^{12}=\alpha^{10}\cdot\alpha = (\alpha^3 + \alpha^2 + 1)\alpha=\alpha^4+\alpha^3+\alpha$\\       
+    $\alpha^{13}$&$\alpha^2 + \alpha$                   &$\alpha^{13}=\alpha^{11}\cdot\alpha = (\alpha + 1)\alpha$\\       
+    $\alpha^{14}$&$\alpha^3 + \alpha^2$                 &$\alpha^{14}=\alpha^{13}\cdot\alpha = (\alpha^2 + \alpha)\alpha$\\       
+    \bottomrule
+\end{tabular}}
+
+
+\newpage
+可发现通过生成元循环生成的循环域$\left<\alpha\right> + \{0\}$在模$p(x)$后得到的有限域$(\left<\alpha\right>+ \{0\})/p(x)$与剩余类$\mathbb{Z}_2[x]/p(x)$存在一一映射，
+即$(\left<\alpha\right>+ \{0\})/p(x)\cong \mathbb{Z}_2[x]/p(x)$。因此该方法可得到有限域$\mathrm{GF}(2^4)$的另一个同构域。
+此外我们将剩余类的系数$a,b,c,d$提取为向量形式，就可得到有限域$\mathrm{GF}(2^4)$的四种表示法：
+\begin{center}
+    \begin{tabular}{cccc}
+        \toprule
+        剩余类表示 & 多项式表示 & 幂次表示 & 矢量表示\\
+        \midrule
+        $0$                             &$0$                                    &$0$                 & $0000$  \\
+        $1$                             &$1$                                    &$\alpha^0 = 1$      & $0001$  \\
+        $x$                             &$\alpha$                               &$\alpha^1$          & $0010$  \\
+        $x^2$                           &$\alpha^2$                             &$\alpha^2$          & $0100$  \\
+        $x^3$                           &$\alpha^3$                             &$\alpha^3$          & $1000$  \\
+        $x^3 + 1$                       &$\alpha^3 + 1$                         &$\alpha^4$          & $1001$  \\
+        $x^3 + x + 1$                   &$\alpha^3 + \alpha + 1$                &$\alpha^5$          & $1011$  \\
+        $x^3 + x^2 + x + 1$             &$\alpha^3 + \alpha^2 + \alpha + 1$     &$\alpha^6$          & $1111$  \\
+        $x^2 + x + 1$                   &$\alpha^2 + \alpha + 1$                &$\alpha^7$          & $0111$  \\
+        $x^3 + x^2 + x$                 &$\alpha^3 + \alpha^2 + \alpha$         &$\alpha^8$          & $1110$  \\
+        $x^2 + 1$                       &$\alpha^2 + 1$                         &$\alpha^9$          & $0101$  \\
+        $x^3 + x$                       &$\alpha^3 + \alpha$                    &$\alpha^{10}$       & $1010$  \\
+        $x^3 + x^2 + 1$                 &$\alpha^3 + \alpha^2 + 1$              &$\alpha^{11}$       & $1101$  \\
+        $x + 1$                         &$\alpha + 1$                           &$\alpha^{12}$       & $0011$  \\
+        $x^2 + x$                       &$\alpha^2 + \alpha$                    &$\alpha^{13}$       & $0110$  \\
+        $x^3 + x^2$                     &$\alpha^3 + \alpha^2$                  &$\alpha^{14}$       & $1100$  \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+(3) 对于有限域$\mathrm{GF}(2^4)$中的任意元素$\beta$，迭代计算$\beta, \beta^p, \beta^{p^2}, \cdots, \beta^{p^k} = \beta$，
+即可得到所有的共轭根组，同时可构成对应的最小多项式。
+\begin{center}
+    \begin{tabular}{ll}
+        \toprule
+        共轭根组 & 最小多项式 \\
+        \midrule
+        $\left\{ 0\right\}$                                                             &$m(x)=x$   \\
+        $\left\{ 1\right\}$                                                             &$m_0(x)=x+1$   \\
+        $\left\{ \alpha, \alpha^2, \alpha^4, \alpha^8\right\}$                          &$m_1(x)=(x-\alpha)(x-\alpha^2)(x-\alpha^4)(x-\alpha^8)$   \\
+        $\left\{ \alpha^{3}, \alpha^{6}, \alpha^{12}, \alpha^{9}\right\}$               &$m_3(x)=(x-\alpha^3)(x-\alpha^6)(x-\alpha^9)(x-\alpha^{12})$   \\
+        $\left\{ \alpha^{5}, \alpha^{10}\right\}$                                       &$m_5(x)=(x-\alpha^5)(x-\alpha^{10})$   \\
+        $\left\{ \alpha^{7}, \alpha^{14}, \alpha^{13}, \alpha^{11}\right\}$             &$m_7(x)=(x-\alpha^7)(x-\alpha^{11})(x-\alpha^{13})(x-\alpha^{14})$   \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+(4) 下面对(3)中的所有最小多项式化简。
+
+    $
+    \begin{aligned}
+        m(x)    &= x\\
+        m_0(x)  &= x+1\\
+        m_1(x)  &= (x-\alpha)(x-\alpha^2)(x-\alpha^4)(x-\alpha^8)\\
+                &= (x^2 - (\alpha + \alpha^2)x + \alpha^3)(x^2 - (\alpha^4 + \alpha^8)x + \alpha^{12})\\
+                &= x^4 - (\alpha + \alpha^2 + \alpha^4 + \alpha^8)x^3 + (\alpha^3 + \alpha^{12} + \alpha^5 + \alpha^9 + \alpha^6 + \alpha^{10})x^2\\
+                &~~~~ - (\alpha^{13} + \alpha^{14} + \alpha^{7} + \alpha^{11})x + \alpha^{15}\\
+                &= x^4 - (0010+0100+1001+1110)x^3 + (1000 + 1011 + 1111 \\
+                &~~~~ + 1010 + 1010 + 0011)x^2 - (0111 + 1101 + 0110 + 1100)x + 1\\
+                &= x^4 - 0001x^3 + 0000 x^2 - 0000x + 1\\
+                &= x^4 + x^3 + 1\\
+        m_3(x)  &= (x-\alpha^3)(x-\alpha^6)(x-\alpha^9)(x-\alpha^{12})\\
+                &= (x^2 - (\alpha^3 + \alpha^6)x + \alpha^9)(x^2 - (\alpha^9 + \alpha^{12})x + \alpha^{6})\\
+                &= x^4 - (\alpha^3 + \alpha^6 + \alpha^9 + \alpha^{12})x^3 + (\alpha^{9}+\alpha^{6}+\alpha^{12}+\alpha^{0}+\alpha^{0}+\alpha^{18})x^2\\
+                &~~~~ - (\alpha^{9} + \alpha^{12} + \alpha^{3} + \alpha^{6})x + \alpha^{15}\\
+                &= x^4 - (1000+1111+0101+0011)x^3 + (0101 +1111 \\
+                &~~~~ + 0011 + 1000)x^2 - (0101 + 0011 + 1000 + 1111)x + 1\\
+                &= x^4 - 0001x^3 + 0001 x^2 - 0001x + 1\\
+                &= x^4 + x^3 + x^2 + x + 1\\
+        m_5(x)  &= (x-\alpha^5)(x-\alpha^{10})= x^2 - (\alpha^5 + \alpha^{10})x + \alpha^0\\
+                &= x^2 - (1011 + 1010)x + 1 = x^2 - 0001x + 1\\
+                &= x^2 + x + 1\\
+        m_7 (x) &= (x-\alpha^7)(x-\alpha^{11})(x-\alpha^{13})(x-\alpha^{14})\\
+                &= (x^2 - (\alpha^7 + \alpha^{11})x + \alpha^3)(x^2 - (\alpha^{13} + \alpha^{14})x + \alpha^{12})\\
+                &= x^4 - (\alpha^7 + \alpha^{11} + \alpha^{13} + \alpha^{14})x^3 + (\alpha^{3}+\alpha^{12}+\alpha^{5}+\alpha^{6}+\alpha^{9}+\alpha^{10})x^2\\
+                &~~~~ - (\alpha^{4} + \alpha^{8} + \alpha^{1} + \alpha^{2})x + \alpha^{15}\\
+                &= x^4 - (0111 + 1101 + 0110 + 1100)x^3 + (1000 + 0011 + 1011 \\
+                &~~~~ + 1111 + 0101 + 1010)x^2 - (1001 + 1110 + 0010 + 0100)x + 1\\
+                &= x^4 - 0000x^3 + 0000 x^2 - 0001x + 1\\
+                &= x^4 + x + 1\\
+    \end{aligned}
+    $
+
+\newpage
+综上所述，有：
+\begin{center}
+    \begin{tabular}{ll}
+        \toprule
+        共轭根组 & 最小多项式 \\
+        \midrule
+        $\left\{ 0\right\}$             &$m(x)=x$   \\
+        $\left\{ 1\right\}$             &$m_0(x)=x+1$   \\
+        $\left\{ \alpha, \alpha^2, \alpha^4, \alpha^8\right\}$             &$m_1(x)=x^4 + x^3 + 1$   \\
+        $\left\{ \alpha^{3}, \alpha^{6}, \alpha^{12}, \alpha^{9}\right\}$             &$m_3(x)=x^4 + x^3 + x^2 + x + 1$   \\
+        $\left\{ \alpha^{5}, \alpha^{10}\right\}$             &$m_5(x)=x^2 + x + 1$   \\
+        $\left\{ \alpha^{7}, \alpha^{14}, \alpha^{13}, \alpha^{11}\right\}$             &$m_7(x)=x^4 + x + 1$   \\
+        \bottomrule
+    \end{tabular}
+\end{center}
+
+(5) 由Fermat小定理，对于非零元$\alpha \in \mathrm{GF}(16)$有：
+\begin{equation}
+    x^{16} - x = \prod_{\alpha \in \mathrm{GF}(16)} (x-\alpha)
+\end{equation}
+
+因此可对$x^{16}- x$因式分解，并对其因式重排列：\\
+
+$
+\begin{aligned}
+    x^{16}- x   &= x (x+1) \left[(x-\alpha)(x-\alpha^2)(x-\alpha^4)(x-\alpha^8)\right]\left[(x-\alpha^3)(x-\alpha^6)(x-\alpha^9)(x-\alpha^{12})\right]\\
+                &~~~~\left[(x-\alpha^5)(x-\alpha^{10})\right]\left[(x-\alpha^7)(x-\alpha^{11})(x-\alpha^{13})(x-\alpha^{14})\right]\\
+                &= m(x)m_0(x)m_1(x)m_3(x)m_5(x)m_7(x)\\
+                &= x(x+1)(x^4 + x^3 + 1)(x^4 + x^3 + x^2 + x + 1)(x^2 + x + 1)(x^4 + x + 1)\\
+\end{aligned}
+$\\
+
+(6) 编写简单脚本计算元素阶
+\begin{lstlisting}[language = Python]
+for i in range(15):
+    order = 1
+    iter = (i + i) % 15
+    while iter != i:
+        iter += i
+        iter %= 15
+        order += 1
+    print(f'{i}\'s order: {order}')
+\end{lstlisting}
+
+得到：
+
+\begin{itemize}
+    
+
+
+    \item $\forall a \in                                                            
+\left\{ 1\right\}$，$ord(a) = 1$
+
+\item $\forall a \in 
+\left\{ \alpha, \alpha^2, \alpha^4, \alpha^8\right\}                                                
+\cup \left\{ \alpha^{7}, \alpha^{14}, \alpha^{13}, \alpha^{11}\right\}$，$ord(a) = 15$
+
+\item $\forall a \in\left\{ \alpha^{3}, \alpha^{6}, \alpha^{12}, \alpha^{9}\right\}$       
+，$ord(a) = 5$
+
+\item $\forall a \in\left\{ \alpha^{5}, \alpha^{10}\right\}$
+，$ord(a) = 3$
+
+\end{itemize}
+
+因此本原元即为$\forall a \in \left\{ \alpha, \alpha^2, \alpha^4, \alpha^8\right\}                                                
+\cup \left\{ \alpha^{7}, \alpha^{14}, \alpha^{13}, \alpha^{11}\right\}$
+
+本原多项式为：$m_1(x)=x^4 + x^3 + 1, m_7(x)=x^4 + x + 1$
+\end{Solution}
