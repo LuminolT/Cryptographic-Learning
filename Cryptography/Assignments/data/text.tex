@@ -304,6 +304,55 @@ Alice 和 Bob 拥有同一个公开社交平台的账号（如，微博）并且
 \end{enumerate}
 
 \begin{Solution}
+    (1) 假设该公开社交平台服务器作为证书管理机构CA，用于密钥管理。
+
+    则Alice向Bob通信时：
+
+    Alice:
+
+    \begin{enumerate}
+        \item 对原文$msg$做哈希，得到消息摘要：$h = h(SK_A, msg)$；
+        \item 对消息摘要$h$用Alice的私钥$SK_A$做数字签名，得到签名：\\
+        $s = SIGN_{RSA}(SK_A, h)$；
+        \item 生成随机密钥$k_A$，对原文和数字签名进行加密，得到密文：\\
+        $c_1 = ENC_{AES}(k_A, msg||s)$；
+        \item 通过CA获得Bob的公钥$PK_B$，对$k_A$加密，得到数字信封：\\
+        $c_2 = ENC_{RSA}(PK_B, k_A)$；
+        \item 将$c_1,c_2$传输给Bob。
+    \end{enumerate}
+    
+    Bob:
+    \begin{enumerate}
+        \item 将$c_2$用Bob的私钥$SK_B$解密，得到：\\
+        $k_A = DEC_{RSA}(SK_B, c_2)$
+        \item 将$c_1$用$k_A$解密，得到：$msg||s = DEC_{AES}(k_A, c_1)$
+        \item 通过CA获得Alice的公钥$PK_A$，对$s$验签，得到传输消息摘要：\\
+        $h = VERIFY_{RSA}(PK_A, s)$
+        \item 对原文$msg$做哈希，得到消息摘要：$h' = h(SK_A, msg)$；
+        \item 比对$h$和$h'$。
+    \end{enumerate}
+
+    此时，通信的安全性验证：
+    \begin{enumerate}
+        \item 若Bob在第1步能用自己的私钥$SK_B$解密，则说明该信息是发给Bob的；
+        \item 若Bob在第3步能用Alice的公钥$SK_A$验签，则说明该信息的发送者是Alice；
+        \item 若Bob在第5步对消息摘要比对成功，则说明原文没有被篡改。
+    \end{enumerate}
+
+    从而，我们可将该通信方法的安全性规约到RSA和AES的安全性上。
+
+    \newpage
+    (2) 该方案能抵御中间人攻击。
+
+    此处Alice和Bob都是通过CA获得对方的公钥信息。而CA会存储提交申请的公钥信息，并对用CA的公钥$SK_{CA}$做数字签名。
+    因此，Alice和Bob都可以通过CA的公钥$PK_{CA}$来验证对方的公钥信息。此处保证从CA签发的证书不可篡改。
+
+    但我们仍需考虑是否在Alice/Bob向CA提交申请时，有中间人篡改Alice, Bob的公钥。若该传输发生在安全信道上，
+    则无需考虑；若发生在不安全信道上，需要Alice在申请通过后向CA询问自己的公钥，由于CA->Alice传输过程
+    是安全的，因此Alice能够判断自己的申请信息是否被篡改，从而重新申请。
+
+    因此，该方案能够抵御中间人攻击。
+    
 \end{Solution}
 
 \section{AES完整性攻击}
@@ -314,8 +363,29 @@ Alice 和 Bob 拥有同一个公开社交平台的账号（如，微博）并且
 \begin{center}
     20814804c1767293b99f1d9cab3bc3e7 ac1e37bfb15599e5f40eef805488281d
 \end{center}
-已知上述密文对应的明文为：”Pay Bob 100\$”。请对上述密文进行修改，得
-到”Pay Bob 500\$” 对应的密文。请给出计算方法和过程。
+已知上述密文对应的明文为："Pay Bob 100\$"。请对上述密文进行修改，得
+到"Pay Bob 500\$" 对应的密文。请给出计算方法和过程。
 
 \begin{Solution}
+    由于采用CBC模式，因此前16个字节为IV，即：
+    \begin{equation}
+        IV = \text{20814804c1767293b99f1d9cab3bc3e7}
+    \end{equation}
+
+        如下图所示，为CBC模式的揭秘过程，对应$P_0=IV\oplus C_0$，因此仅需修改$IV$，就可以使得$P_0$解密错误。
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=0.6\textwidth]{figures/cbc_decryption.png}
+    \end{figure}
+    
+    查表得$ord('1') = 49, ord('5') = 53, ord('1') \oplus ord('5') = 0\text{x}04$，设置覆盖串为：
+
+    $s = \text{0x00000000000000000400000000000000}$
+
+    $IV' = IV \oplus s =~$0x20814804c1767293b\underline{d}9f1d9cab3bc3e7
+
+    因此最终密文修改为：
+    \begin{center}
+        20814804c1767293b\underline{d}9f1d9cab3bc3e7 ac1e37bfb15599e5f40eef805488281d
+    \end{center}
 \end{Solution}
