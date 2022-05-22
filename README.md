@@ -1,6 +1,6 @@
 # Cryptographic-Learning
 
-A repository of Luminolt's Crypto Learning Log.
+A repository of Luminolt's Learning Log.
 
 ## Content
 
