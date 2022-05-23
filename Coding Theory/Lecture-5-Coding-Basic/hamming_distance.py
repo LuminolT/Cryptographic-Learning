@@ -5,7 +5,7 @@ def find_minimun_distance(C: list[int]) -> int:
     res = bin(C[0] ^ C[1]).count("1")
     for i in range(len(C)):
         for j in range(i+1, len(C)):
-            print(f'd_{i+1}_{j+1} := {bin(C[i] ^ C[j])}')
+            print(f'd_{i+1}_{j+1} = {bin(C[i] ^ C[j]).count("1")}')
             res = min(res, bin(C[i] ^ C[j]).count("1"))
     return(res)
 
