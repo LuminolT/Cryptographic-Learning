@@ -4,9 +4,9 @@ from Crypto.Hash import SHA256
 BLOCK_SIZE = 1024
 
 
-def get_file_block(path_file_name):
-    f = open(path_file_name, 'rb')
-    for idx in reversed(range(0, os.path.getsize(path_file_name), BLOCK_SIZE)):
+def get_file_block(file_name):
+    f = open(file_name, 'rb')
+    for idx in reversed(range(0, os.path.getsize(file_name), BLOCK_SIZE)):
         f.seek(idx)
         yield f.read(BLOCK_SIZE)
     f.close()
