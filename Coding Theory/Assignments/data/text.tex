@@ -959,3 +959,423 @@ for i in range(15):
     \end{equation}
 
 \end{Solution}
+
+\chapter{第八周作业}
+\section{第14题}
+
+设$C$是一个二元$(6,3)$线性码，其生成矩阵为：
+\begin{equation}
+    \bm{G} =
+    \left(
+            \begin{matrix}
+                1 &0 &1 &1 &0 &0\\
+                0 &1 &0 &0 &1 &0\\
+                0 &0 &1 &1 &1 &1\\
+            \end{matrix}
+        \right)
+\end{equation}
+
+(1) 求出所有的校验子$\bm{Hx}'$和与之相对应的陪集首$\bm{e}$；
+
+(2) 求出以$\bm{e} = (000100) $ 为陪集首的$C$的陪集；
+
+(3) 设收到的字为$\bm{r}=(011011)$，计算$r$的校验子$\bm{Hr}'$，并确定$r$的译码。
+
+\begin{Solution}
+    (1)同13题理，可对生成矩阵$\bm{G}$做初等行变换得到与$C$等价的码$C'$的生成矩阵$\bm{G}'$，并且他们的校验矩阵$\bm{H}$相同。
+
+    $
+    \begin{aligned}
+        \bm{G} &= \left(
+        \begin{matrix}
+            1 &0 &1 &1 &0 &0\\
+            0 &1 &0 &0 &1 &0\\
+            0 &0 &1 &1 &1 &1\\
+        \end{matrix}
+    \right)
+    \sim
+    \left(
+        \begin{matrix}
+            1 &0 &0 &0 &1 &1\\
+            0 &1 &0 &0 &1 &0\\
+            0 &0 &1 &1 &1 &1\\
+        \end{matrix}
+    \right)
+    = \bm{G}_0
+    \end{aligned}
+    $\\
+
+    因此得到：
+    \begin{equation}
+        \bm{H} = \bm{H}_0=
+        \left(
+            \begin{matrix}
+                0 &0 &1 &1 &0 &0\\
+                1 &1 &1 &0 &1 &0\\
+                1 &0 &1 &0 &0 &1\\
+            \end{matrix}
+        \right)
+    \end{equation}
+
+    可求出其校验子和所对应的陪集首：
+
+    \begin{center}
+        \begin{tabular}{cc}
+            \toprule
+            校验子$\bm{Hx}'$ & 陪集首$\bm{e}$ \\
+            \midrule
+            $000$ & $(000000)'$\\
+            $001$ & $(000001)'$\\
+            $100$ & $(000100)'$\\
+            $111$ & $(001000)'$\\
+            $011$ & $(100000)'$\\
+            \hdashline
+            $010$ & $(000010)'$\\
+            $101$ & $(011000)'$                 \\
+            $110$ & $(001001)'$                 \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+
+    (2) 首先根据生成矩阵$\bm{G}$，可求得所有码字：
+    
+    $C=\left\{000000, 101100, 010010, 111110, 001111, 100011, 011101, 110001\right\}$
+
+    因此可得到以$\bm{e}$为陪集首的$C$的陪集即为$C+\bm{e}$：
+
+    $C+\bm{e} = \left\{\bm{e}+\bm{c}:\bm{c}\in C\right\}$
+
+    $= \left\{ 000100, 101000, 010110, 111010, 001011, 100111, 011001, 110101\right\}$
+
+    \vspace{8pt}
+
+    (3) 根据矩阵运算规则可得到校验子为$\bm{Hr}' = (110)'$。
+    
+    此时为不确定译码，译为$\bm{r}-\bm{e_7} = (010010)'$
+\end{Solution}
+
+\newpage
+\chapter{研讨项目2（编码部分）——线性分组码的讨论}
+
+\textbf{目的}：掌握线性分组码的编码问题、译码问题、纠错能力和检错能力。
+
+\textbf{要求}：构造一个$(n,k)$线性分组码，讨论它的生成矩阵、校验矩阵、译码表的构造、译码方法、纠错能力和检错能力。
+
+
+以二元$(6,3)$线性码为例：
+
+(1) 写出一个二元$(6,3)$线性码$C$的生成矩阵$\bm{G}$；
+
+\begin{Solution}
+给定一个二元$(6,3)$线性码$C$的生成矩阵$\bm{G}$，为：
+    \begin{equation}
+        \bm{G} =
+        \left(
+            \begin{matrix}
+                1 &0 &1 &1 &0 &0\\
+                0 &1 &0 &0 &1 &0\\
+                0 &0 &1 &1 &1 &1\\
+            \end{matrix}
+        \right)
+    \end{equation}
+\end{Solution}
+
+(2) 求出$C$的全部码字；
+
+\begin{Solution}
+$\sigma(a_0,a_1,a_2) = a_0v_0 + a_1v_1 + a_2v_2 = (a_0,a_1,a_2)\bm{G}$
+        
+        因此$C$中共有$8$个码字：
+    
+        $
+        \begin{aligned}
+            &\sigma(000) = 000000,~
+            \sigma(001) = 001111,~
+            \sigma(010) = 010010,~
+            \sigma(011) = 011101,\\
+            &\sigma(100) = 101100,~
+            \sigma(101) = 100011,~
+            \sigma(110) = 111110,~
+            \sigma(111) = 110001\\
+        \end{aligned}
+        $\\
+    \end{Solution}
+
+    (3) 求出$C$的校验矩阵$\bm{H}$；（讨论生成矩阵$\bm{G}$和校验矩阵$\bm{H}$的关系）
+
+\begin{Solution}
+通过初等行变换可得到与C等价的系统码的生成矩阵$\bm{G}_0$：\\
+    
+        $
+        \begin{aligned}
+            \bm{G} &= \left(
+            \begin{matrix}
+                1 &0 &1 &1 &0 &0\\
+                0 &1 &0 &0 &1 &0\\
+                0 &0 &1 &1 &1 &1\\
+            \end{matrix}
+        \right)
+        \sim
+        \left(
+            \begin{matrix}
+                1 &0 &0 &0 &1 &1\\
+                0 &1 &0 &0 &1 &0\\
+                0 &0 &1 &1 &1 &1\\
+            \end{matrix}
+        \right)
+        = \bm{G}_0
+        \end{aligned}
+        $\\
+    
+        由于等价码的生成矩阵行等价，因此其对应解空间相同。因此码$C$校验矩阵$\bm{H}$即为系统码$C_0$的校验矩阵：
+        \begin{equation}
+            \bm{H} = \bm{H}_0=
+            \left(
+                \begin{matrix}
+                    0 &0 &1 &1 &0 &0\\
+                    1 &1 &1 &0 &1 &0\\
+                    1 &0 &1 &0 &0 &1\\
+                \end{matrix}
+            \right)
+        \end{equation}
+
+        【讨论】考虑校验矩阵的作用，即为找到向量组$\left\{\bm{h}\right\}$使得其与码字向量正交，从而使得码字向量与校验向量的内积为$0$。
+        因此自然地，校验矩阵的生成子空间与生成矩阵的生成子空间，为正交子空间关系。即有校验矩阵的行空间与生成矩阵的行空间正交。而一个矩阵的行空间
+        与其零空间正交，因此可以得到：
+        \begin{equation}
+            \label{eq:HG}
+            \mathrm{row}(\bm{H}) \cong \mathrm{null}(\bm{G}) \bot \mathrm{row}(\bm{G})
+        \end{equation}
+
+        于是我们得到了求解一致校验矩阵$\bm{H}$的通法，即求解生成矩阵$\bm{G}$的零空间（通过求解齐次线性方程组得到）。
+
+        我们考虑$\bm{G}_0$为相抵标准型（即对应码为系统码）的情况，此时$\bm{G}_0$形如：
+        \begin{equation}
+            \bm{G}_0 = \left(\bm{I}_{n\times n} | \bm{A}_{n\times k}\right)=
+            \left(
+                \begin{matrix}
+                    1 &0  &\cdots &0 &g_{1, n+1} &\cdots & g_{1, n+k}\\
+                    0 &1  &\cdots &0 &g_{2, n+1} &\cdots & g_{2, n+k}\\
+                    \vdots  &\vdots &\ddots &\vdots &\vdots &\vdots&\vdots\\
+                    0 & 0  &\cdots  & 1 & g_{n, n+1} & \cdots & g_{n, n+k}\\
+                \end{matrix}
+            \right)
+        \end{equation}
+
+        此时前$n$列为主元，可得方程组：$x_i = \sum_{j=n+1}^{n+k}a_jg_{i,j},~1\leq i \leq n$
+
+        可对$a_j$轮流取$1$，得到基础解系：
+        \begin{equation}
+            \xi_i = (-g_{1, n+i}, -g_{2, n+i}, \cdots, -g_{n, n+i}, 0, \cdots, 1, \cdots, 0),~1\text{在第}n+i\text{列}
+        \end{equation}
+
+        根据\ref{eq:HG}式可得：
+        \begin{equation}
+            \bm{H}_0 = \mathrm{expand_{row}}(\left\{\xi\right\})
+            \left(
+                \begin{matrix}
+                    -g_{1, n+1}& -g_{2, n+1}& \cdots& -g_{n, n+1} & 1 & 0 & \cdots & 0\\
+                    -g_{1, n+2}& -g_{2, n+2}& \cdots& -g_{n, n+2} & 0 & 1 & \cdots & 0\\
+                    \vdots &\vdots &\vdots &\vdots &\vdots &\vdots &\ddots&\vdots\\
+                    -g_{1, n+k}& -g_{2, n+k}& \cdots& -g_{n, n+k} & 0  & 0& \cdots & 1\\
+                \end{matrix}
+            \right)
+        \end{equation}
+
+        观察发现，$\bm{H}_0 = \left( -\bm{A}_{n\times k}' |\bm{I}_{k\times k}\right)$
+
+        于是，对于系统码，我们得到了求解一致校验矩阵的简便方法。此外，对于一般的码，给定它的生成矩阵$\bm{G}$，
+        一定可以通过一系列行初等变换$\bm{P}$得到相抵标准型。
+
+        形式化的，我们给出：
+        \begin{equation}
+            \bm{G} = \bm{P_1}\bm{P_2}\cdots\bm{P_k}\bm{G}_0 = \bm{P}\bm{G}_0 \cong \bm{G}_0
+        \end{equation}
+
+        而对于行等价的矩阵，有：$\mathrm{null}(\bm{G}) = \mathrm{null}(\bm{G_0}) = \mathrm{row}(\bm{H}_0)$
+
+        即$\bm{H}_0$也为生成矩阵$\bm{G}$对应码的一致校验矩阵。
+        
+        也就是说，对于任意线性分组码$C$，都可以通过生成矩阵的初等行变化找到与之等价的系统码$C_0$，而通过$C_0$一致校验矩阵的简便求法求出的$\bm{H}_0$，
+        即为码$C$的一致校验矩阵。
+
+        总结该部分结论：
+        \begin{enumerate}
+            \item 一个线性分组码$C$的生成矩阵零空间，与其一致校验矩阵的行空间相同；
+            \item 对于系统码$C_0$，若其生成矩阵为$\bm{G}_0=\left(\bm{I}_{n\times n} | \bm{A}_{n\times k}\right)$，
+            则其一致校验矩阵为$\bm{H}_0 = \left( -\bm{A}_{n\times k}' |\bm{I}_{k\times k}\right)$
+            \item 对于一般的线性分组码$C$，其一致校验矩阵$\bm{H}$即为与之等价的系统码的一致校验矩阵$\bm{H}_0$。
+        \end{enumerate}
+    \end{Solution}
+
+    (4) 求出所有校验子$\bm{Hx}'$和与之相对应的陪集首$\bm{e}$
+
+\begin{Solution}
+根据一致校验矩阵$\bm{H}$可求出其校验子和所对应的陪集首：
+
+    \begin{center}
+        \begin{tabular}{cc}
+            \toprule
+            校验子$\bm{Hx}'$ & 陪集首$\bm{e}$ \\
+            \midrule
+            $000$ & $(000000)'$\\
+            $001$ & $(000001)'$\\
+            $100$ & $(000100)'$\\
+            $111$ & $(001000)'$\\
+            $011$ & $(100000)'$\\
+            \hdashline
+            $010$ & $(000010)'$\\
+            $101$ & $(011000)'$                 \\
+            $110$ & $(001001)'$                 \\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+\end{Solution}
+
+(5) 求出以$\bm{e}=(000100)$为陪集首的$C$的陪集；（讨论译码表的构造）
+
+\begin{Solution}
+由(2) ， 
+    $C=\left\{000000, 101100, 010010, 111110, 001111, 100011, 011101, 110001\right\}$
+
+    因此可得到以$\bm{e}$为陪集首的$C$的陪集即为$C+\bm{e}$：
+
+    $C+\bm{e} = \left\{\bm{e}+\bm{c}:\bm{c}\in C\right\}$
+
+    $= \left\{ 000100, 101000, 010110, 111010, 001011, 100111, 011001, 110101\right\}$
+
+    【讨论】设信源发送的码字为$\bm{c}_{src}$，在信道传输中产生噪音$\bm{e}$，
+    
+    则信宿得到码字为$\bm{c}_{dst}=\bm{c}_{src}+\bm{e}$。
+
+    将其右乘一致校验矩阵，得到：$\bm{Hc}_{dst}' = \bm{H}(\bm{c}_{src}'+\bm{e}') = \bm{H}\bm{c}_{src}'+\bm{H}\bm{e}' = \bm{He}'$
+
+    因此对于同一错误$\bm{e}$，对应的出错码字$\left\{\bm{c}+\bm{e}\right\}$即为码$C$在$\bm{e}$下的陪集$C+\bm{e}$。
+
+    因此我们可将校验子$\bm{He}'$和陪集首$\bm{e}$一一对应，得到译码表。
+    \begin{center}
+        \begin{tabular}{rrrrrr}
+            \toprule
+            校验子$\bm{Hx}'$ & 陪集首 &  & & &\\
+            \midrule
+            $\bm{H}\bm{0}'$ & $\bm{0}$ & $\bm{c}_1 $& $\bm{c}_2$ & $\cdots$ & $\bm{c}_{q^k-1}$\\
+            $\bm{H}\bm{e}_1'$ & $\bm{e}_1$ & $\bm{e}_1+\bm{c}_1$ & $\bm{e}_1+\bm{c}_2$ &$ \cdots$ & $\bm{e}_1+\bm{c}_{q^k-1}$\\
+            $\cdots$&$\cdots$&$\cdots$&$\cdots$&$\cdots$&$\cdots$\\
+            $\bm{H}\bm{e}_{q^{n-k}-1}'$ & $\bm{e}_{q^{n-k}-1}$ & $\bm{e}_{q^{n-k}-1}+\bm{c}_1$ & $\bm{e}_{q^{n-k}-1}+\bm{c}_2$ & $\cdots$ & $\bm{e}_{q^{n-k}-1}+\bm{c}_{q^k-1}$\\
+            \bottomrule
+        \end{tabular}
+    \end{center}
+
+    此时我们发现，由陪集首即可确认整个陪集。因此译码表中只有校验子和陪集首需要存储。
+
+    在译码表生成过程中，需要考虑陪集首对所有可能的校验子进行对应。
+
+    给定校验子，取陪集首为对应最小重量（对于向量即为最小1-范数）的向量。当该向量唯一时，为确定译码，反之为不确定译码。
+    给出形式化的定义：
+    \begin{equation}
+        \bm{e} \in \left\{\bm{e}\right\} = \underset{\bm{e}\in {\mathrm{GF}(p)^{k}}}{\arg\min} \left\{ ||e||_1:\bm{He}' = \bm{Hx}' \right\}
+    \end{equation}
+
+    当$\#\left\{\bm{e}\right\} = 1$时，为确定译码，当$\#\left\{\bm{e}\right\} > 1$时，为不确定译码。
+\end{Solution}
+
+(6) 设收到的字为$\bm{r}=(011011)$，计算$\bm{r}$的校验子$\bm{Hr}'$，并确定$\bm{r}$的译码。（讨论译码方法）
+
+\begin{Solution}
+根据矩阵运算规则可得到校验子为$\bm{Hr}' = (110)'$。
+    
+    此时为不确定译码，译为$\bm{r}-\bm{e_7} = (010010)'$
+
+    【讨论】设信源发送的码字为$\bm{c}_{src}$，    
+    信宿得到码字为$\bm{c}_{dst}$，则译码流程为：
+
+    \begin{enumerate}
+        \item 计算$\bm{c}_{dst}$的校验子$\bm{H}\bm{c}_{dst}'$
+        \item 查表得到与$\bm{H}\bm{c}_{dst}'$对应的陪集首$\bm{e}$
+        \item 将$\bm{c}_{dst}$译码为$\bm{c}_{dst}-e$
+    \end{enumerate}
+
+    特别地，根据校验子可判断是否为确定译码或不确定译码。
+\end{Solution}
+
+
+(7) 简述判断线性分组码的纠错能力和检错能力的方法；
+
+\begin{Solution}
+    授课中已给出将线性分组码译码规约到极大似然译码的方法，此处不在证明。给出引理：
+
+    \begin{lemma}
+        线性分组码$C$的极小距离，即为非零码字的极小重量。
+    \end{lemma}
+
+    下面进行简单证明：根据Hamming距离的定义，有：$d(\bm{a},\bm{b}) = ||\bm{a} + \bm{b}||_1 $
+
+    而根据线性分组码的线性性，可有$\bm{c} \in C = \bm{a} + \bm{b}$，因此：
+    \begin{equation}
+        d(\bm{a},\bm{b}) = ||\bm{c}||_1
+    \end{equation}
+
+    因此$\min \left\{d(\bm{a},\bm{b})\right\} = \min \left\{||\bm{c}||_1\right\}$，证毕。
+
+    \begin{theorem}
+        （纠错码基本定理）码$C$的极小距离为$d$，则码$C$最多可纠正$\left\lfloor (d-1)/2\right\rfloor $个错误，检查$d-1$个错误。
+    \end{theorem}
+
+    根据纠错码基本定理，即可得到判断纠错能力和检错能力的一种方法。
+
+    \begin{theorem}
+        \label{theo:hamming:check}
+        线性分组码$C$的极小距离为$d$，当且仅当$C$的一致校验矩阵$H$的任意$d-1$列线性无关，存在$d$列线性相关。
+    \end{theorem}
+
+    根据定理\ref{theo:hamming:check}，给出了另外一种方法判断线性分组码的纠错能力和检错能力。
+\end{Solution}
+
+(8) 判断该线性码$C$是可以检几错的检错码和可以纠几错的纠错码。
+
+\begin{Solution}
+    由(2) ， 
+    $C=\left\{000000, 101100, 010010, 111110, 001111, 100011, 011101, 110001\right\}$
+
+    编写简单脚本计算Hamming距离：
+
+\begin{lstlisting}[language = Python]
+from math import floor
+
+def find_minimun_distance(C: list[int]) -> int:
+    res = bin(C[0] ^ C[1]).count("1")
+    for i in range(len(C)):
+        for j in range(i+1, len(C)):
+            print(f'd_{i+1}_{j+1} = {bin(C[i] ^ C[j]).count("1")}')
+            res = min(res, bin(C[i] ^ C[j]).count("1"))
+    return(res)
+
+C = [0b000000, 0b101100, 0b010010, 0b111110, 0b001111, 0b100011, 0b011101, 0b110001]
+min_dis = find_minimun_distance(C)
+print(f"min_dis: {min_dis}, detect: {min_dis - 1}, correct: {floor((min_dis - 1)/2)}")
+\end{lstlisting}
+
+    可得到极小距离$d_{\min}$为$2$，根据纠错码基本定理：
+
+    可检错误：$d_{\min} - 1 = 2 - 1  = 1$
+
+    可纠错误：$\lfloor (d_{\min} -1)/ 2\rfloor = \lfloor (2 -1)/ 2\rfloor = 0$
+
+    即$C$是可以检$1$错，纠$0$错的纠错码。
+
+另可根据码$C$的一致校验矩阵$\bm{H}$：
+\begin{equation}
+    \bm{H} = 
+    \left(
+        \begin{matrix}
+            0 &0 &1 &1 &0 &0\\
+            1 &1 &1 &0 &1 &0\\
+            1 &0 &1 &0 &0 &1\\
+        \end{matrix}
+    \right)
+\end{equation}
+
+    发现，任意1列线性无关，存在2列线性相关（2列和5列)。因此其极小距离$d_{\min}$为$2$，同样可得到上述结论。
+
+    综上所述，可根据2种方法得到：$C$是可以检$1$错，纠$0$错的纠错码。
+\end{Solution}
