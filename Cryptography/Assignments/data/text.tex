@@ -389,3 +389,132 @@ Alice 和 Bob 拥有同一个公开社交平台的账号（如，微博）并且
         20814804c1767293b\underline{d}9f1d9cab3bc3e7 ac1e37bfb15599e5f40eef805488281d
     \end{center}
 \end{Solution}
+
+\newpage
+\chapter{第五次作业}
+
+\section{基于ElGamal的代理重加密}
+
+Bob 所在公司的邮件服务器发布了一个公钥$PK_{Bob}$，这样所有 Bob 收
+到的电子邮件可以在$PK_{Bob}$下加密以保证机密性。当 Bob 去度假时，他指
+示公司的邮件服务器将他收到的所有电子邮件转发给他的同事 Alice。Alice
+的公钥是$PK_{Alice}$。邮件服务器需要一种方法将公钥 $PK_{Bob}$下加密的电
+子邮件“翻译”成使用公钥$PK_{Alice}$加密的电子邮件。如果邮件服务器有
+$SK_{Bob}$，“翻译”将容易完成，但随后邮件服务器可以读取 Bob 收到的所有
+电子邮件，所以是不可取的。因此基于 ElGamal 加密方案进行修改，得到如
+下方案（代理重加密）：
+
+令$\mathbb{G}$是阶为素数$q$的循环群，$g\in \mathbb{G}$是生成元。当使用公钥$PK=u=g^\alpha\in\mathbb{G}$
+进行加密时，其过程如下：
+
+\begin{itemize}
+    \item 随机选取$\beta\stackrel{R}{\leftarrow} \mathbb{Z}_p$， 计算$v=g^\beta, k=H(u^\beta)$，
+    \item 计算$c=E_s(k,m)$，输出$(v,c)$作为密文。
+\end{itemize}
+
+其中$E_s$是对称加密算法，密钥空间为$\mathcal{K}_s$，$H:\mathbb{G}\rightarrow\mathcal{K}_s$是一个哈希函数。
+
+令Alice的私钥为$\alpha \in \mathbb{Z}_q$，Bob的私钥为$\alpha' \in \mathbb{Z}_q$。为了实现从公钥
+$PK_{Bob}$下密文到$PK_{Alice}$下密文的隐私保护“翻译”，Alice和Bob共同计算$\tau = \alpha / \alpha'$，并将其发送给邮件服务器。
+
+\begin{enumerate}
+    \item 请解释邮件服务器如何用$\tau$将密文$c=E(PK_{Bob},m)$“翻译”成Alice可以解密的密文$c'$；
+    \item 请分析：如果邮件服务器可以使用$\tau$解密发送给Bob的邮件，那么他也可以攻破修改后ElGamal方案的安全性。
+    即，证明若存在一个高效的算法$\mathcal{A}$，给定$(g,g^\alpha, g^{\alpha'},\tau, c=E(PK_{Bob},m))$作为输入，
+    能够输出$m$，那么存在一个算法$\mathcal{B}$能够利用算法$\mathcal{A}$攻破ElGamal的语义安全性。
+\end{enumerate}
+
+\begin{Solution}
+    (1) 根据所给的加密方案 $c = (v_0, c_0)$，其中$v_0=g^{\beta}$是一个随机数。
+
+    则此时邮件服务器需要完成的重加密过程为：
+    \begin{enumerate}
+        \item 计算 $v_1 = v_0 ^ \tau$；
+        \item 将 $c' = (v_1, c_0)$发送给Alice。
+    \end{enumerate}
+
+    Alice在收到重加密密文$(v_1, c_0)$后，可计算：
+
+    \begin{enumerate}
+        \item $v_1^{\alpha'} = v_0 ^ {\alpha'\tau} = g^{\alpha'\beta \alpha / \alpha' }
+        =g^{\alpha\beta}$；
+        \item $k = H(g^{\alpha\beta}) = H({PK_{Bob}}^\beta)$；
+        \item $m = D_s(k, c_0)$，其中$D_s$为对称加密算法$E_s$对应的解密算法。
+    \end{enumerate}
+    
+    (2) 如下图\ref{fig:1}所示，ElGamal密码体系语义安全的示意图。
+    \begin{figure}[!htbp]
+        \centering
+        \includegraphics[width=0.4\textwidth]{figures/1.png}
+        \caption{ElGamal密码体系语义安全}
+        \label{fig:1}
+    \end{figure}
+
+    构造算法$\mathcal{B}=\mathcal{A}(g,g^a,g^a,\tau = a/a = 1,c)$，敌手给出不同消息$m_0,m_1$后，
+    可根据算法$\mathcal{B}$对挑战者返回的密文进行解密。
+    
+    则此时敌手的优势：
+    \begin{equation}
+        \begin{aligned}
+            \mathrm{Adv_{ElGamal}}[A, E_{\mathrm{ElGamal}}]    &= |\mathrm{Pr}[EXP(0)=1] - \mathrm{Pr}[EXP(1)=1]|\\
+                                        &= 1
+        \end{aligned}
+    \end{equation}
+
+    即攻破了ElGamal的语义安全性。
+
+\end{Solution}
+
+
+\section{RSA 共用模数下的安全性分析}
+
+在基于RSA的陷门置换中，每个用户需要使用不同的模数$N=pq$。假设多个用户使用同一个模数
+$N=pq$，每个用户使用不同的公钥$e_i\in \mathbb{Z}$和私钥$d_i \in \mathbb{Z}$，
+其中$e_i\cdot d_i \equiv 1 \bmod \varphi(N)$。从表面上看，似乎该方案是可行的。需要签署消息
+$m \in \mathcal{M}$时，Alice计算$\sigma_A=H(m)^{d_a}$，其中$H:\mathcal{M}\rightarrow \mathbb{Z}_N^*$
+是一个哈希函数。类似的当Bob需要签署消息时，计算$\sigma_b = H(m)^{d_b}$。由于只有Alice知道$d_a$的值，
+只有Bob知道$d_b$的值，所以方案看起来似乎有合理性。然而方法是存在安全性攻击的：Bob可以使用他的私钥伪造
+Alice的签名。
+
+\begin{enumerate}
+    \item 请分析Bob可以使用其公私钥对$(e_b,d_b)$获取任何一个$\varphi(N)$的倍数$v$。
+    \item 如果Bob知道Alice的公钥$e_a$，对于任意的消息$m$，请尝试计算$\sigma = H(m)^{1/e_a}$，
+    进而完成签名的伪造。
+\end{enumerate}
+
+\begin{Solution}
+    (1) 由同余方程$e_i\cdot d_i \equiv 1 \bmod \varphi(N)$可得：
+    \begin{equation}
+        e_b\cdot d_b = 1 + k\varphi(N),~k\in\mathbb{N}
+    \end{equation}
+    由Euler定理，对$a\in \mathbb{Z}_N$，若$\gcd(a, N) = 1$，则$a^{\varphi(N)} \equiv 1 \bmod(N)$，则有：
+    \begin{equation}
+        a^{k\varphi(N)} \equiv a^{e_b\cdot d_b-1} \equiv 1 \bmod(N)
+    \end{equation}
+    又由于$e_b\cdot d_b-1$为偶数，设$e_b\cdot d_b-1 = 2^st$，其中$t$是一个奇数，则有
+    $ a^{2^st} \equiv 1 \bmod(N)$。
+
+    在该同余方程下进行攻击：
+    \begin{enumerate}
+        \item 取随机数$a \in \mathbb{Z}_N^*$，此时$\gcd(a, N) = 1$恒成立；
+        \item 计算$k = e_b\cdot d_b - 1$；
+        \item 计算$x = a^{k/2},a^{k/4},\cdots,a^{k/2^t} (\bmod N)$，直至$x>1$且$y=\gcd(x-1, N)>1$
+        \item 若无这样的$y$，重新取随机数。
+    \end{enumerate}
+
+    事实上，上述攻击流程中得到的$y$，恰为$N$的一个因子$p$，根据扩展欧几里得算法易求得$q=p^{-1} \bmod N$，此时即求得$\varphi(N)$。
+    从而即可求得$\varphi(N)$的任意倍数$v$。
+
+    注：在上述攻击中，可证明对于至少一半的$a\in\mathbb{Z}_N^*$，存在$i\in[1,s]$使得：
+    \begin{equation}
+        a^{2^{i-1}t} \not\equiv \pm 1 (\bmod N), a^{2^{i}t} \equiv 1(\bmod N)
+    \end{equation}
+    若满足，则$\gcd(a^{2^{i-1}t}-1, N)$是$N$的一个非平凡因子\footnote{https://ctf-wiki.org/crypto/asymmetric/rsa/d\_attacks/rsa\_d\_attack/}。
+
+    (2) 由于Alice和Bob的公私钥共模数，且Bob已被证明可对$N$进行分解。因此此时可以直接计算出Alice的私钥：
+    \begin{equation}
+        d_a = e_a^{-1} \bmod \varphi(N)
+    \end{equation}
+
+    于是便可对任意消息伪造Alice的签名$\sigma = H(m)^{1/e_a} = \sigma = H(m)^{d_a}$
+\end{Solution}
