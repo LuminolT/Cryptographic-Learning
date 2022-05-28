@@ -5,11 +5,10 @@ BLOCK_SIZE = 1024
 
 
 def get_file_block(file_name):
-    f = open(file_name, 'rb')
-    for idx in reversed(range(0, os.path.getsize(file_name), BLOCK_SIZE)):
-        f.seek(idx)
-        yield f.read(BLOCK_SIZE)
-    f.close()
+    with open(file_name, 'rb') as f:
+        for idx in reversed(range(0, os.path.getsize(file_name), BLOCK_SIZE)):
+            f.seek(idx)
+            yield f.read(BLOCK_SIZE)
 
 
 def stream_hash(file_name):
@@ -22,7 +21,7 @@ def stream_hash(file_name):
 
 def main() -> None:
     file_name = '6.1.intro.mp4'
-    file_name = '6.2.birthday.mp4'
+    # file_name = '6.2.birthday.mp4'
     print(stream_hash(file_name.encode()))
 
 
