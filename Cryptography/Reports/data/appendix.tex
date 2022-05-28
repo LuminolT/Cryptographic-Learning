@@ -1,0 +1,660 @@
+\chapter{实验代码}
+
+\section{Shamir 秘密共享}
+\label{appendix:Shamir}
+
+shamir.py
+
+\begin{lstlisting}[language = Python]
+from Crypto.Util.py3compat import is_native_int
+from Crypto.Util import number
+from Crypto.Util.number import long_to_bytes, bytes_to_long
+from Crypto.Random import get_random_bytes as rng
+
+
+def _mult_gf2(f1, f2):
+    """Multiply two polynomials in GF(2)"""
+
+    # Ensure f2 is the smallest
+    if f2 > f1:
+        f1, f2 = f2, f1
+    z = 0
+    while f2:
+        if f2 & 1:
+            z ^= f1
+        f1 <<= 1
+        f2 >>= 1
+    return z
+
+
+def _div_gf2(a, b):
+    """
+    Compute division of polynomials over GF(2).
+    Given a and b, it finds two polynomials q and r such that:
+
+    a = b*q + r with deg(r)<deg(b)
+    """
+
+    if (a < b):
+        return 0, a
+
+    deg = number.size
+    q = 0
+    r = a
+    d = deg(b)
+    while deg(r) >= d:
+        s = 1 << (deg(r) - d)
+        q ^= s
+        r ^= _mult_gf2(b, s)
+    return (q, r)
+
+
+class _Element(object):
+    """Element of GF(2^128) field"""
+
+    # The irreducible polynomial defining this field is 1+x+x^2+x^7+x^128
+    irr_poly = 1 + 2 + 4 + 128 + 2 ** 128
+
+    def __init__(self, encoded_value):
+        """Initialize the element to a certain value.
+
+        The value passed as parameter is internally encoded as
+        a 128-bit integer, where each bit represents a polynomial
+        coefficient. The LSB is the constant coefficient.
+        """
+
+        if is_native_int(encoded_value):
+            self._value = encoded_value
+        # elif len(encoded_value) == 16:
+        else:
+            self._value = bytes_to_long(encoded_value)
+        # else:
+        #     raise ValueError("The encoded value must be an integer or a 16 byte string")
+
+    def __eq__(self, other):
+        return self._value == other._value
+
+    def __int__(self):
+        """Return the field element, encoded as a 128-bit integer."""
+        return self._value
+
+    def encode(self):
+        """Return the field element, encoded as a 16 byte string."""
+        return long_to_bytes(self._value)
+
+    def __mul__(self, factor):
+
+        f1 = self._value
+        f2 = factor._value
+
+        # Make sure that f2 is the smallest, to speed up the loop
+        if f2 > f1:
+            f1, f2 = f2, f1
+
+        if self.irr_poly in (f1, f2):
+            return _Element(0)
+
+        mask1 = 2 ** 128
+        v, z = f1, 0
+        while f2:
+            # if f2 ^ 1: z ^= v
+            mask2 = int(bin(f2 & 1)[2:] * 128, base=2)
+            z = (mask2 & (z ^ v)) | ((mask1 - mask2 - 1) & z)
+            v <<= 1
+            # if v & mask1: v ^= self.irr_poly
+            mask3 = int(bin((v >> 128) & 1)[2:] * 128, base=2)
+            v = (mask3 & (v ^ self.irr_poly)) | ((mask1 - mask3 - 1) & v)
+            f2 >>= 1
+        return _Element(z)
+
+    def __add__(self, term):
+        return _Element(self._value ^ term._value)
+
+    def inverse(self):
+        """Return the inverse of this element in GF(2^128)."""
+
+        # We use the Extended GCD algorithm
+        # http://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor
+
+        if self._value == 0:
+            raise ValueError("Inversion of zero")
+
+        r0, r1 = self._value, self.irr_poly
+        s0, s1 = 1, 0
+        while r1 > 0:
+            q = _div_gf2(r0, r1)[0]
+            r0, r1 = r1, r0 ^ _mult_gf2(q, r1)
+            s0, s1 = s1, s0 ^ _mult_gf2(q, s1)
+        return _Element(s0)
+
+    def __pow__(self, exponent):
+        result = _Element(self._value)
+        for _ in range(exponent - 1):
+            result = result * self
+        return result
+
+
+class Shamir(object):
+    """Shamir's secret sharing scheme.
+
+    A secret is split into ``n`` shares, and it is sufficient to collect
+    ``k`` of them to reconstruct the secret.
+    """
+
+    @staticmethod
+    def split(k, n, secret):
+        """Split a secret into ``n`` shares.
+
+        The secret can be reconstructed later using just ``k`` shares
+        out of the original ``n``.
+        Each share must be kept confidential to the person it was
+        assigned to.
+
+        Each share is associated to an index (starting from 1).
+
+        Args:
+          k (integer):
+            The sufficient number of shares to reconstruct the secret (``k < n``).
+          n (integer):
+            The number of shares that this method will create.
+          secret (byte string):
+            A byte string of 16 bytes (e.g. the AES 128 key).
+
+        Return (tuples):
+            ``n`` tuples. A tuple is meant for each participant and it contains two items:
+
+            1. the unique index (an integer)
+            2. the share (a byte string, 16 bytes)
+        """
+
+        #
+        # We create a polynomial with random coefficients in GF(2^128):
+        #
+        # p(x) = \sum_{i=0}^{k-1} c_i * x^i
+        #
+        # c_0 is the encoded secret
+        #
+
+        coeffs = [_Element(rng(16)) for i in range(k - 1)]
+        coeffs.append(_Element(secret))
+
+        # Each share is y_i = p(x_i) where x_i is the public index
+        # associated to each of the n users.
+
+        def make_share(user, coeffs):
+            idx = _Element(user)
+            share = _Element(0)
+            for coeff in coeffs:
+                share = idx * share + coeff
+
+            return share.encode()
+
+        return [(i, make_share(i, coeffs)) for i in range(1, n + 1)]
+
+    @staticmethod
+    def combine(shares):
+        """Recombine a secret, if enough shares are presented.
+
+        Args:
+          shares (tuples):
+            The *k* tuples, each containin the index (an integer) and
+            the share (a byte string, 16 bytes long) that were assigned to
+            a participant.
+          ssss (bool):
+            If ``True``, the shares were produced by the ``ssss`` utility.
+            Default: ``False``.
+
+        Return:
+            The original secret, as a byte string (16 bytes long).
+        """
+
+        k = len(shares)
+
+        gf_shares = []
+        for x in shares:
+            idx = _Element(x[0])
+            value = _Element(x[1])
+            if any(y[0] == idx for y in gf_shares):
+                raise ValueError("Duplicate share")
+            gf_shares.append((idx, value))
+
+        result = _Element(0)
+        for j in range(k):
+            x_j, y_j = gf_shares[j]
+
+            numerator = _Element(1)
+            denominator = _Element(1)
+
+            for m in range(k):
+                x_m = gf_shares[m][0]
+                if m != j:
+                    numerator *= x_m
+                    denominator *= x_j + x_m
+            result += y_j * numerator * denominator.inverse()
+        return result.encode()
+\end{lstlisting}
+
+\newpage
+widget.py
+\begin{lstlisting}[language = Python]
+# This Python file uses the following encoding: utf-8
+import os
+from pathlib import Path
+import sys
+
+from shamir import Shamir
+from binascii import hexlify, unhexlify
+
+from PySide2.QtWidgets import QApplication, QWidget
+from PySide2.QtCore import QFile
+from PySide2.QtUiTools import QUiLoader
+
+
+class Widget(QWidget):
+    def __init__(self):
+        super(Widget, self).__init__()
+        self.ui = QUiLoader().load('form.ui')
+        self.ui.show()
+        self.ui.pushButton_create_share.clicked.connect(self.create_shares)
+        self.ui.pushButton_combine_share.clicked.connect(self.combine_shares)
+
+    def create_shares(self):
+        secret = self.ui.plainTextEdit_Secret.toPlainText().encode()
+        l = Shamir.split(3, 5, secret)
+        print(l)
+        self.ui.plainTextEdit_s1.setPlainText(str(hexlify(l[0][1]))[2:-1])
+        self.ui.plainTextEdit_s2.setPlainText(str(hexlify(l[1][1]))[2:-1])
+        self.ui.plainTextEdit_s3.setPlainText(str(hexlify(l[2][1]))[2:-1])
+        self.ui.plainTextEdit_s4.setPlainText(str(hexlify(l[3][1]))[2:-1])
+        self.ui.plainTextEdit_s5.setPlainText(str(hexlify(l[4][1]))[2:-1])
+        pass
+
+    def combine_shares(self):
+        self.ui.plainTextEdit_cs.setPlainText("NULL")
+        shares = []
+        if len(self.ui.plainTextEdit_s1.toPlainText()) != 0:
+            shares.append((1, unhexlify(self.ui.plainTextEdit_s1.toPlainText().encode())))
+        if len(self.ui.plainTextEdit_s2.toPlainText()) != 0:
+            shares.append((2, unhexlify(self.ui.plainTextEdit_s2.toPlainText().encode())))
+        if len(self.ui.plainTextEdit_s3.toPlainText()) != 0:
+            shares.append((3, unhexlify(self.ui.plainTextEdit_s3.toPlainText().encode())))
+        if len(self.ui.plainTextEdit_s4.toPlainText()) != 0:
+            shares.append((4, unhexlify(self.ui.plainTextEdit_s4.toPlainText().encode())))
+        if len(self.ui.plainTextEdit_s5.toPlainText()) != 0:
+            shares.append((5, unhexlify(self.ui.plainTextEdit_s5.toPlainText().encode())))
+        print(shares)
+        secret = Shamir.combine(shares)
+        self.ui.plainTextEdit_cs.setPlainText(secret.decode())
+        pass
+
+
+if __name__ == "__main__":
+    app = QApplication([])
+    widget = Widget()
+    widget.show()
+    sys.exit(app.exec_())
+\end{lstlisting}
+
+\newpage
+form.ui
+\begin{lstlisting}[language = html]
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Widget</class>
+ <widget class="QWidget" name="Widget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>557</width>
+    <height>313</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Widget</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0" colspan="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>3, 5 - Shamir Secret Sharing</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Secret</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Share 1</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>Share 2</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Combined Share</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPlainTextEdit" name="plainTextEdit_Secret"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPlainTextEdit" name="plainTextEdit_s1"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="QPlainTextEdit" name="plainTextEdit_s2"/>
+   </item>
+   <item row="2" column="3" rowspan="3">
+    <widget class="QPlainTextEdit" name="plainTextEdit_cs"/>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Share 3</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Share 4</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="QLabel" name="label_7">
+     <property name="text">
+      <string>Share 5</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QPlainTextEdit" name="plainTextEdit_s3"/>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPlainTextEdit" name="plainTextEdit_s4"/>
+   </item>
+   <item row="4" column="2">
+    <widget class="QPlainTextEdit" name="plainTextEdit_s5"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QPushButton" name="pushButton_create_share">
+     <property name="text">
+      <string>Create Shares</string>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="pushButton_combine_share">
+     <property name="text">
+      <string>Combine Shares</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
+
+\end{lstlisting}
+
+\newpage
+image.py
+\begin{lstlisting}[language = Python]
+from statistics import mode
+import numpy as np
+import matplotlib.pyplot as plt
+from shamir import *
+from binascii import hexlify
+
+img = plt.imread('cat.jpg')
+# plt.imshow(img)
+
+def img_split(k, n, img: np.ndarray):
+    a, b, c = img.shape
+    l = []
+    for i in range(n):
+        l.append(np.zeros((a, b, c), np.dtype('int')))
+    for i in range(a):
+        for j in range(b):
+            for kk in range(c):
+                tmp_share = Shamir.split(k, n, int(img[i, j, kk]))
+                for idx in range(n):
+                    l[idx][i, j, kk] = bytes_to_long(tmp_share[idx][1])
+    return l
+
+tmp_l = img_split(3, 5, img)
+tmp_l.append(img)
+
+print('imhere')
+
+def show_images(images: list[np.ndarray]) -> None:
+    n: int = len(images)
+    f = plt.figure()
+    for i in range(n):
+        # Debug, plot figure
+        f.add_subplot(1, n, i + 1)
+        plt.imshow(images[i])
+
+    plt.show(block=True)
+
+show_images(tmp_l)
+
+plt.show()
+\end{lstlisting}
+
+\newpage
+\section{Many Time Pad}
+\label{appendix:mtp}
+main.py
+\begin{lstlisting}[language = Python]
+from binascii import unhexlify
+from string import ascii_letters
+from math import sqrt
+import utils
+
+def main():
+    cipher_texts = []
+    with open('cipher_text.txt', encoding='utf-8') as file:
+        content = file.read().split('\n')
+    for i in range(1, 21, 2):
+        cipher_texts.append(unhexlify(content[i]))
+
+    with open('dest_text.txt', encoding='utf-8') as file:
+        content = file.read()
+    dest_text = unhexlify(content)
+
+    letters = ascii_letters.encode('ascii')     ## ASCII letters
+
+    key = [0] * 1024
+
+    for ct_a in cipher_texts:
+        possible_pos = [0] * len(ct_a)
+        for ct_b in cipher_texts:
+            if ct_a == ct_b:
+                continue
+            guess_str = utils.byte_xor(ct_a, ct_b)
+            for idx, guess_char in enumerate(guess_str):
+                if guess_char not in letters and guess_char != 0:
+                    continue
+                possible_pos[idx] += 1
+
+        threshold = len(cipher_texts) - sqrt(len(cipher_texts))   ## Magic threshold
+
+        for i in range(len(ct_a)):
+            if possible_pos[i] > threshold:
+                key[i] = ct_a[i] ^ 0x20
+
+    print(utils.byte_xor(dest_text, key))
+
+
+if __name__ == '__main__':
+    main()
+\end{lstlisting}
+
+\newpage
+utils.py
+\begin{lstlisting}[language = Python]
+def byte_xor(a: bytes, b: bytes) -> bytes:
+    '''
+    :return: xor result of a and b
+    '''
+    if len(a) > len(b):
+        return bytes([x ^ y for x, y in zip(a[:len(b)], b)])
+    else:
+        return bytes([x ^ y for x, y in zip(a, b[:len(a)])])
+\end{lstlisting}
+
+
+\newpage
+\section{AES}
+\label{appendix:aes}
+main.py
+\begin{lstlisting}[language = Python]
+from binascii import unhexlify
+from utils import *
+
+def main():
+    keys = []
+    cipher_texts = []
+    with open('infos.txt', encoding='utf-8') as file:
+        content = file.read().split('\n')
+    for i in range(1, 16, 4):
+        keys.append(unhexlify(content[i]))
+        cipher_texts.append(unhexlify(content[i+2]))
+
+    print(CBC.decrypt(cipher_texts[0], keys[0]))
+    print(CBC.decrypt(cipher_texts[1], keys[1]))
+    print(CTR.decrypt(cipher_texts[2], keys[2]))
+    print(CTR.decrypt(cipher_texts[3], keys[3]))
+
+if __name__ == '__main__':
+    main()
+\end{lstlisting}
+
+utils.py
+\begin{lstlisting}[language = Python]
+import binascii
+from Crypto.Cipher import AES
+from cxc_toolkit import integer
+
+def byte_xor(a: bytes, b: bytes) -> bytes:
+    '''
+    :return: xor result of a and b
+    '''
+    if len(a) > len(b):
+        return bytes([x ^ y for x, y in zip(a[:len(b)], b)])
+    else:
+        return bytes([x ^ y for x, y in zip(a, b[:len(a)])])
+
+def to_int(byte):
+    """
+    Convert bytes to int
+
+    :type byte: bytes
+    :rtype: int
+    """
+    s = 0
+    for i, number in enumerate(byte):
+        s = s * 256 + number
+    return s
+
+
+def byte_add(byte, addtions):
+    """
+    Add int to bytes
+
+    :type byte: bytes
+    :type addtions: int
+    :rtype: bytes
+    """
+    return integer.to_bytes(to_int(byte) + addtions, bytes_size=len(byte))
+
+def msg_block_generator(msg, padding=False):
+        while len(msg) >= 16:
+            yield msg[:16]
+            msg = msg[16:]
+        if len(msg) > 0:
+            if not padding:
+                yield msg
+                return
+
+            reminder = 16 - len(msg)
+            msg = msg + bytes([reminder]) * reminder
+            yield msg
+        else:
+            yield b'16' * 16
+
+
+def cipher_block_generator(cipher):
+    while len(cipher):
+        yield cipher[:16]
+        cipher = cipher[16:]
+
+class CBC:
+
+    def encrypt(msg, key, iv):
+        cipher = AES.new(key, AES.MODE_ECB)
+        cipher_block = iv
+        ciphertext = iv
+        for msg_block in msg_block_generator(msg, padding=True):
+            cipher_block = cipher.encrypt(byte_xor(cipher_block, msg_block))
+            ciphertext += cipher_block
+        return ciphertext
+
+
+    def decrypt(cipher_text, key):
+        cipher = AES.new(key, AES.MODE_ECB)
+        iv, cipher_text = cipher_text[:16], cipher_text[16:]
+        msg = b''
+        for cipher_block in cipher_block_generator(cipher_text):
+            msg_block = byte_xor(cipher.decrypt(cipher_block), iv)
+            iv = cipher_block
+            msg += msg_block
+        if msg[-16:] == b'\x16' * 16:
+            return msg[:-16]
+        pad_bytes = msg[-1]
+        reminder = len(msg) - pad_bytes
+        if msg[reminder:] == bytes([pad_bytes]) * pad_bytes:
+            return msg[:reminder]
+        else:
+            print('Cipher text is invalid')
+
+
+class CTR:
+
+    def encrypt(msg, key, iv):
+        cipher = AES.new(key, AES.MODE_ECB)
+        ciphertext = b''
+        for i, msg_block in enumerate(msg_block_generator(msg, padding=False)):
+            cipher_block = cipher.encrypt(byte_add(iv, i))
+            cipher_block = byte_xor(msg_block, cipher_block)
+            ciphertext += cipher_block
+        return ciphertext
+
+    def decrypt(cipher_text, key):
+        iv, cipher_text = cipher_text[:16], cipher_text[16:]
+        cipher = AES.new(key, AES.MODE_ECB)
+        msg = b''
+        for i, cipher_block in enumerate(cipher_block_generator(cipher_text)):
+            iv_encrypted = cipher.encrypt(byte_add(iv, i))
+            msg_block = byte_xor(cipher_block, iv_encrypted)
+            msg += msg_block
+        return msg
+
+\end{lstlisting}

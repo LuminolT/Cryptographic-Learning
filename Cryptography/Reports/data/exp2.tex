@@ -1,0 +1,51 @@
+\chapter{Many Time Pad}
+
+\section{实验目的}
+
+我们已经证明一次一密在已知密文攻击下是安全的。本次实验将尝试探索当密钥被重复使用时的已知密文攻击方法。
+
+\section{实验要求}
+如下所示是11个使用同一个密钥按照one time pad方法进行加密得到的密文。
+请使用前10个密文进行分析，并对目标密文进行解密。
+其中消息是[a-zA-Z]以及空格组成的字符，使用ascii编码，密文使用hex编码。
+
+\section{实验内容}
+
+\subsection{攻击思路}
+
+此处的攻击思路参考了Ruan的文章\cite{ruan_2020}。
+
+MTP的不安全性来源于ASCII编码的性质。给定密文$c_1,c_2$、明文$m_1,m_2$和密钥$k$，
+根据加密方案和异或运算的性质有：
+\begin{equation}
+    c_1 \oplus c_2 = (m_1 \oplus k) \oplus (m_2 \oplus k) = m_1 \oplus m_2
+\end{equation}
+
+而在ASCII编码方案中，空格的字节码为0x20，0x41-0x5A 是大写字母 A-Z，0x61-0x7A 是小写字母 a-z。
+发现小写字母异或空格时，恰得到其对应的大写字母，反之亦然。
+
+因此分析密文中的内容，如果某一位为字母，则说明其对应的明文位和密钥位必有一个是其对应大写或小写化的字母，
+而另外个是空格。
+
+而对于对条密文的某一位如果大部分为字母，则可以猜测这一位的密钥是空格。
+
+此处，“大部分”被具体定义为猜测阈值，笔者给定猜测阈值为：
+\begin{equation}
+    threshold = |C| - \sqrt{|C|}
+\end{equation}
+
+其中$C$为所给密文集合，该公式没有理论上的依据性，只是恰好得到的结果比较好，实际上还可对其上下调节。
+
+\subsection{程序设计与实现}
+
+具体代码见附录\ref{appendix:mtp}，此处仅对关键设计进行说明。
+
+由于所给密文使用了hex编码，因此此处利用了Python binascii库中的
+unhexlify函数进行解码，转化为字节串。
+
+\subsection{攻击结果}
+
+最终得到的字符串为：The secuet-message\textbackslash xeeis: Wh\textbackslash x1an usi|g a stream cipher, never\textbackslash xf8use the key more than once
+可发现该种攻击方式不能完全还原原来的明文。
+
+但由于自然语言本身具有纠错性，因此可根据上下文语义人工猜测原明文为：The secret message is: When using a stream cipher, never reuse the key more than once.
