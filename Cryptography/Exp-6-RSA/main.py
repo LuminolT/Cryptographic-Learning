@@ -8,17 +8,12 @@ def factoring_1(N):
     A, r = gmpy2.isqrt_rem(N)
     if r > 0:
         A += 1
-
     A_squared_minus_N = A**2 - N
     x = gmpy2.isqrt(A_squared_minus_N)
-
     p = A - x
     q = A + x
-
     N_slash = gmpy2.mul(p, q)
-
     assert N == N_slash
-
     return p, q
 
 
@@ -26,7 +21,6 @@ def factoring_2(N):
     N_sqrt, r = gmpy2.isqrt_rem(N)
     if r > 0:
         N_sqrt += 1
-
     for offset in range(2**20):
         A = N_sqrt + offset
         A_squared_minus_N = A**2 - N
